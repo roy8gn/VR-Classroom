@@ -16,6 +16,8 @@ public class Board : MonoBehaviour
     public BoardState boardState = BoardState.Start;
     public TextMeshPro text;
     public Lesson lesson = new Lesson();
+    public Lesson[] lessons = new Lesson[3];
+    public int secondsToWait = 3;
     
     // Start is called before the first frame update
     void Start()
@@ -46,17 +48,24 @@ public class Board : MonoBehaviour
     void StartNewLesson()
     {
         SetBoardText("Lesson has started,\n be prepared...");
-        StartCoroutine(WaitBeforeShow());
+        StartCoroutine(RunLesson());
     }
 
-    private IEnumerator WaitBeforeShow()
+    private IEnumerator RunLesson()
     {
         for(int i=0; i<lesson.words.Length; i++)
         {
-            yield return new WaitForSeconds(2);
-            SetBoardText(this.lesson.words[i].EnglishTranslation);
+            yield return new WaitForSeconds(secondsToWait);
+            DisplayWordOnBoard(this.lesson.words[i]);
         }
-        
+
+        yield return new WaitForSeconds(secondsToWait);
+        SetBoardText("Lesson has ended.");
+    }
+    public void DisplayWordOnBoard(Word w)
+    {
+        text = GetComponentInChildren<TextMeshPro>();
+        text.text = string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}");
     }
 
     public void SetBoardText(string boardText)
@@ -64,12 +73,14 @@ public class Board : MonoBehaviour
         text = GetComponentInChildren<TextMeshPro>();
         text.text = boardText;
     }
-
 }
 public class Word
 {
     public string ForiegnWord { get; set; }
     public string EnglishTranslation { get; set; }
+    public string WrongTranslation1 { get; set; }
+    public string WrongTranslation2 { get; set; }
+    public string WrongTranslation3 { get; set; }
 
     public Word(string foriegnWord, string englishTranslation)
     {
