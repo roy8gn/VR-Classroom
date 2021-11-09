@@ -7,7 +7,9 @@ public enum BoardState
 {
     Start,
     Lesson,
+    LessonEnded,
     Exam,
+    ExamEnded,
     End
 }
 
@@ -38,8 +40,15 @@ public class Board : MonoBehaviour
             ChangeBoardStatus(BoardState.Lesson);
             StartNewLesson();
         }
-    }
+        else
+        {
+            if (boardState == BoardState.LessonEnded)
+            {
+                ChangeBoardStatus(BoardState.Exam);
 
+            }
+        }
+    }
     void ChangeBoardStatus(BoardState newState)
     {
         boardState = newState;
@@ -60,7 +69,8 @@ public class Board : MonoBehaviour
         }
 
         yield return new WaitForSeconds(secondsToWait);
-        SetBoardText("Lesson has ended.");
+        SetBoardText("Lesson has ended.\nPress Start to begin the exam.");
+        ChangeBoardStatus(BoardState.LessonEnded);
     }
     public void DisplayWordOnBoard(Word w)
     {

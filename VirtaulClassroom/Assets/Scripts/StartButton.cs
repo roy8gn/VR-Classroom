@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class StartButton : VrClassButton
 {
-    public delegate void ButtonPressedHandler();
-    public event ButtonPressedHandler StartButtonPressed;
+    public delegate void StartButtonPressedHandler();
+    public event StartButtonPressedHandler StartButtonPressed;
 
     public override void Pressed()
     {

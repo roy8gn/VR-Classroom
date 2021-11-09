@@ -5,6 +5,7 @@ using UnityEngine;
 public class BoardReactToButton : Board
 {
     [SerializeField] private StartButton startButton;
+    [SerializeField] private OptionAButton OptionAButton;
 
     void Start()
     {
