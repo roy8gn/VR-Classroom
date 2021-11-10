@@ -18,6 +18,7 @@ public class Board : MonoBehaviour
     public BoardState boardState = BoardState.Start;
     public TextMeshPro text;
     public Lesson lesson = new Lesson();
+    public Exam exam;
     public Lesson[] lessons = new Lesson[3];
     public int secondsToWait = 3;
     
@@ -48,6 +49,15 @@ public class Board : MonoBehaviour
 
             }
         }
+        else
+        {
+            if (boardState == BoardState.Exam)
+            {
+                StarNewExam();
+                ChangeBoardStatus(BoardState.ExamEnded);
+
+            }
+        }
     }
     void ChangeBoardStatus(BoardState newState)
     {
@@ -58,6 +68,26 @@ public class Board : MonoBehaviour
     {
         SetBoardText("Lesson has started,\n be prepared...");
         StartCoroutine(RunLesson());
+    }
+
+    void StartNewExam()
+    {
+        SetBoardText("Exam has started,\n be prepared...");
+        exam = new Exam(lesson.words);
+        yield return new WaitForSeconds(secondsToWait);
+        for (int i = 0; i < exam.words.Length; i++)
+        {
+            DisplayWordOnBoard(this.lesson.words[i]);
+        }
+
+        yield return new WaitForSeconds(secondsToWait);
+        SetBoardText("Lesson has ended.\nPress Start to begin the exam.");
+        ChangeBoardStatus(BoardState.LessonEnded);
+    }
+    public void DisplayWordOnBoard(Word w)
+    {
+        text = GetComponentInChildren<TextMeshPro>();
+        text.text = string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}");
     }
 
     private IEnumerator RunLesson()
@@ -71,11 +101,6 @@ public class Board : MonoBehaviour
         yield return new WaitForSeconds(secondsToWait);
         SetBoardText("Lesson has ended.\nPress Start to begin the exam.");
         ChangeBoardStatus(BoardState.LessonEnded);
-    }
-    public void DisplayWordOnBoard(Word w)
-    {
-        text = GetComponentInChildren<TextMeshPro>();
-        text.text = string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}");
     }
 
     public void SetBoardText(string boardText)
@@ -113,4 +138,16 @@ public class Lesson
         words[5] = new Word("Adom", "Red");
         words[6] = new Word("Mayim", "Water");
     }
+}
+
+public class Exam
+{
+    public Word[] words;
+    public int score;
+    public Exam(Word[] w)
+    {
+        words = w;
+        score = 0;
+    }
+    public 
 }
