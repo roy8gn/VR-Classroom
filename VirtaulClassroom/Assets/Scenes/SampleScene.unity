@@ -3321,7 +3321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardState: 0
-  text: {fileID: 0}
+  boardText: {fileID: 0}
   secondsToWait: 3
 --- !u!1 &1148466885
 GameObject:
@@ -7219,7 +7219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardState: 0
-  text: {fileID: 1048486671}
+  boardText: {fileID: 0}
   secondsToWait: 3
 --- !u!114 &1981783593
 MonoBehaviour:
@@ -7234,7 +7234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardState: 0
-  text: {fileID: 0}
+  boardText: {fileID: 0}
   secondsToWait: 3
   startButton: {fileID: 5629920}
   OptionAButton: {fileID: 0}
