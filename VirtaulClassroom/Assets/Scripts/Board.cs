@@ -1,8 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using System;
+using Random = System.Random;
+
 public enum BoardState
 {
     Start,
@@ -15,7 +17,12 @@ public enum BoardState
 
 public class Board : MonoBehaviour
 {
-    public TextMeshPro boardText;
+    public TextMeshPro LessonBoardText;
+    public TextMeshPro ExamQuestionBoardText;
+    public TextMeshPro OptionAText;
+    public TextMeshPro OptionBText;
+    public TextMeshPro OptionCText;
+    public TextMeshPro OptionDText;
 
     public BoardState boardState = BoardState.Start;
     int sessions = 3;
@@ -33,8 +40,8 @@ public class Board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        boardText = GetComponentInChildren<TextMeshPro>();
-        boardText.text = "Welcome!\nPress Start to begin";
+        LessonBoardText = GetComponentInChildren<TextMeshPro>();
+        LessonBoardText.text = "Welcome!\nPress Start to begin";
     }
 
     // Update is called once per frame
@@ -42,12 +49,22 @@ public class Board : MonoBehaviour
     {
     }
 
+    void GetControlOnAllTextMeshPros()
+    {
+        LessonBoardText = GetComponentInChildren<TextMeshPro>();
+        ExamQuestionBoardText = GetComponentInChildren<TextMeshPro>();
+        OptionAText = GetComponentInChildren<TextMeshPro>();
+        OptionBText = GetComponentInChildren<TextMeshPro>();
+        OptionCText = GetComponentInChildren<TextMeshPro>();
+        OptionDText = GetComponentInChildren<TextMeshPro>();
+    }
+
     public void OnStartButtonPressed()
     {
         switch (boardState)
         {
             case BoardState.Start:
-                boardText = GetComponentInChildren<TextMeshPro>();
+                GetControlOnAllTextMeshPros();
                 ChangeBoardStatus(BoardState.Lesson);
                 lessons = new Lesson[sessions];
                 exams = new Exam[sessions];
@@ -96,7 +113,8 @@ public class Board : MonoBehaviour
 
     void StartNewLesson()
     {
-        SetBoardText("Lesson has started,\n be prepared...");
+        SetLessonBoardVisibility();
+        LessonBoardText.text = string.Format("Lesson has started,\n be prepared...");
         lessons[currentSessionIndex] = new Lesson();
         currentLesson = lessons[currentSessionIndex];
         StartCoroutine(RunLesson()); // Run a lesson
@@ -104,10 +122,11 @@ public class Board : MonoBehaviour
 
     public void StartNewExam()
     {
-        SetBoardText("Exam has started,\n be prepared...");
+        LessonBoardText.SetText(string.Format("Exam has started,\n be prepared..."));
         exams[currentSessionIndex] = new Exam(lessons[currentSessionIndex].words);
         currentExam = exams[currentSessionIndex];
         BoardWaitForSeconds(secondsToWait);
+        SetExamBoardVisibility();
         DisplayQuestionOnBoard(currentExam.questions[0]);
     }
 
@@ -125,34 +144,62 @@ public class Board : MonoBehaviour
         }
 
         yield return new WaitForSeconds(secondsToWait);
-        SetBoardText("Lesson has ended.\nPress Start to begin the exam.");
+        LessonBoardText.SetText(string.Format("Lesson has ended.\nPress Start to begin the exam."));
         ChangeBoardStatus(BoardState.LessonEnded);
     }
     public void DisplayWordOnBoard(Word w)
     {
-        boardText = GetComponentInChildren<TextMeshPro>();
-        boardText.text = string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}");
-    }
-
-    public void SetBoardText(string bt)
-    {
-        boardText = GetComponentInChildren<TextMeshPro>();
-        boardText.text = bt;
+        LessonBoardText.SetText(string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}"));
     }
 
     public void DisplayQuestionOnBoard(Question q)
     {
-        boardText = GetComponentInChildren<TextMeshPro>();
+        ExamQuestionBoardText.SetText(string.Format($"'{q.word.ForiegnWord}' is...?"));
+        OptionAText.SetText(string.Format($"A. {q.options[0]}"));
+        OptionBText.SetText(string.Format($"B. {q.options[1]}"));
+        OptionCText.SetText(string.Format($"C. {q.options[2]}"));
+        OptionDText.SetText(string.Format($"D. {q.options[3]}"));
+    }
+    
+    public void SetLessonBoardVisibility() // Not Working yet
+    {
+        //LessonBoardText.enabled = true;
+        //ExamQuestionBoardText.enabled = false;
+        //OptionAText.enabled = false;
+        //OptionBText.enabled = false;
+        //OptionCText.enabled = false;
+        //OptionDText.enabled = false;
 
-        boardText.SetText(string.Format($"{q.word.ForiegnWord} is...\nA.{q.options[0]}  B.{q.options[1]}" +
-            $"\nC.{q.options[2]}   D.{q.options[3]}"));
+        LessonBoardText.gameObject.SetActive(false);
+        ExamQuestionBoardText.gameObject.SetActive(true);
+        OptionAText.gameObject.SetActive(true);
+        OptionBText.gameObject.SetActive(true);
+        OptionCText.gameObject.SetActive(true);
+        OptionDText.gameObject.SetActive(true);
+    }
+    
+    public void SetExamBoardVisibility() // Not Working yet
+    {
+        //LessonBoardText.enabled = false;
+        //ExamQuestionBoardText.enabled = true;
+        //OptionAText.enabled = true;
+        //OptionBText.enabled = true;
+        //OptionCText.enabled = true;
+        //OptionDText.enabled = true;
+
+        LessonBoardText.gameObject.SetActive(true);
+        ExamQuestionBoardText.gameObject.SetActive(false);
+        OptionAText.gameObject.SetActive(false);
+        OptionBText.gameObject.SetActive(false);
+        OptionCText.gameObject.SetActive(false);
+        OptionDText.gameObject.SetActive(false);
     }
 }
 public class Word
 {
     public string ForiegnWord { get; set; }
     public string EnglishTranslation { get; set; }
-    public string []WrongTranslations;
+    public string[] WrongTranslations;
 
     public Word(string foriegnWord, string englishTranslation, string wt1, string wt2, string wt3)
     {
@@ -171,13 +218,13 @@ public class Lesson
     public Lesson()
     {
         words = new Word[7];
-        words[0] = new Word("Kelev", "Dog", "Cat", "Pig", "Cow");
-        words[1] = new Word("Hatul", "Cat", "a", "b", "c");
-        words[2] = new Word("Anglit", "English", "a", "b", "c");
-        words[3] = new Word("Halav", "Milk", "a", "b", "c");
-        words[4] = new Word("Tapuz", "Orange", "a", "b", "c");
-        words[5] = new Word("Adom", "Red", "a", "b", "c");
-        words[6] = new Word("Mayim", "Water", "a", "b", "c");
+        words[0] = new Word("Perro", "Dog", "Cat", "Pig", "Crocodile");
+        words[1] = new Word("Gato", "Cat", "a", "b", "c");
+        words[2] = new Word("Inglés", "English", "a", "b", "c");
+        words[3] = new Word("Leche", "Milk", "a", "b", "c");
+        words[4] = new Word("Naranja", "Orange", "a", "b", "c");
+        words[5] = new Word("Rojo", "Red", "Orange", "Rooster", "Rain");
+        words[6] = new Word("Agua", "Water", "Door", "Milk", "Chair");
     }
 }
 
@@ -189,7 +236,11 @@ public class Exam
     public Exam(Word[] w)
     {
         questions = new Question[w.Length];
-        questions[0] = new Question(w[0]);
+        for(int i=0; i<w.Length; i++)
+        {
+            questions[i] = new Question(w[i]);
+        }
+        
         score = 0;
     }
 }
@@ -197,7 +248,7 @@ public class Exam
 public class Question
 {
     public Word word;
-    int? userAnswerIndex; // The index of user's answer
+    int? userAnswerIndex { get; set; } // The index of user's answer
     int correctAnswerIndex;
     bool? isCorrectAnswer;
     public string[] options;
@@ -211,7 +262,7 @@ public class Question
 
     public void generateQuestionOptions()
     {
-        System.Random random = new System.Random();
+        Random random = new Random();
         correctAnswerIndex = random.Next(0, 3);
         options[correctAnswerIndex] = String.Copy(word.EnglishTranslation);
         int i = 0, j = 0;
@@ -228,5 +279,17 @@ public class Question
         }
     }
 
+    public void CheckUserAnswer()
+    {
+        if (userAnswerIndex != null)
+        {
+            if (userAnswerIndex == correctAnswerIndex)
+                isCorrectAnswer = true;
+            else
+                isCorrectAnswer = false;
+        }
+        else
+            isCorrectAnswer = false;
+    }
  
 }
