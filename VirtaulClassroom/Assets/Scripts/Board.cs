@@ -24,6 +24,9 @@ public class Board : MonoBehaviour
     public TextMeshPro OptionCText;
     public TextMeshPro OptionDText;
 
+    [SerializeField] private StartButton startButton;
+    [SerializeField] private OptionAButton optionAButton;
+
     public BoardState boardState = BoardState.Start;
     int sessions = 3;
     int currentSessionIndex = 0;
@@ -40,8 +43,11 @@ public class Board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        startButton.StartButtonPressed += OnStartButtonPressed;
+        optionAButton.OptionAButtonPressed += OnOptionAButtonPressed;
+
         LessonBoardText = GetComponentInChildren<TextMeshPro>();
-        LessonBoardText.text = "Welcome!\nPress Start to begin";
+        LessonBoardText.SetText("Welcome!\nPress Start to begin");
     }
 
     // Update is called once per frame
@@ -49,14 +55,10 @@ public class Board : MonoBehaviour
     {
     }
 
-    void GetControlOnAllTextMeshPros()
+    public void OnDestroy()
     {
-        LessonBoardText = GetComponentInChildren<TextMeshPro>();
-        ExamQuestionBoardText = GetComponentInChildren<TextMeshPro>();
-        OptionAText = GetComponentInChildren<TextMeshPro>();
-        OptionBText = GetComponentInChildren<TextMeshPro>();
-        OptionCText = GetComponentInChildren<TextMeshPro>();
-        OptionDText = GetComponentInChildren<TextMeshPro>();
+        startButton.StartButtonPressed -= OnStartButtonPressed;
+        optionAButton.OptionAButtonPressed -= OnOptionAButtonPressed;
     }
 
     public void OnStartButtonPressed()
@@ -64,7 +66,6 @@ public class Board : MonoBehaviour
         switch (boardState)
         {
             case BoardState.Start:
-                GetControlOnAllTextMeshPros();
                 ChangeBoardStatus(BoardState.Lesson);
                 lessons = new Lesson[sessions];
                 exams = new Exam[sessions];
@@ -88,7 +89,8 @@ public class Board : MonoBehaviour
 
     public void OnOptionAButtonPressed()
     {
-
+        waitingForUserAnswer = false;
+        currentExam.questions[0].userAnswerIndex = 0;
     }
 
     public void OnOptionBButtonPressed()
@@ -113,8 +115,8 @@ public class Board : MonoBehaviour
 
     void StartNewLesson()
     {
-        SetLessonBoardVisibility();
-        LessonBoardText.text = string.Format("Lesson has started,\n be prepared...");
+        //SetLessonBoardVisibility();
+        LessonBoardText.SetText(string.Format("Lesson has started,\n be prepared..."));
         lessons[currentSessionIndex] = new Lesson();
         currentLesson = lessons[currentSessionIndex];
         StartCoroutine(RunLesson()); // Run a lesson
@@ -126,7 +128,7 @@ public class Board : MonoBehaviour
         exams[currentSessionIndex] = new Exam(lessons[currentSessionIndex].words);
         currentExam = exams[currentSessionIndex];
         BoardWaitForSeconds(secondsToWait);
-        SetExamBoardVisibility();
+        //SetExamBoardVisibility();
         DisplayQuestionOnBoard(currentExam.questions[0]);
     }
 
@@ -150,10 +152,16 @@ public class Board : MonoBehaviour
     public void DisplayWordOnBoard(Word w)
     {
         LessonBoardText.SetText(string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}"));
+        ExamQuestionBoardText.SetText(string.Empty);
+        OptionAText.SetText(string.Empty);
+        OptionBText.SetText(string.Empty);
+        OptionCText.SetText(string.Empty);
+        OptionDText.SetText(string.Empty);
     }
 
     public void DisplayQuestionOnBoard(Question q)
     {
+        LessonBoardText.SetText(string.Empty);
         ExamQuestionBoardText.SetText(string.Format($"'{q.word.ForiegnWord}' is...?"));
         OptionAText.SetText(string.Format($"A. {q.options[0]}"));
         OptionBText.SetText(string.Format($"B. {q.options[1]}"));
@@ -161,39 +169,7 @@ public class Board : MonoBehaviour
         OptionDText.SetText(string.Format($"D. {q.options[3]}"));
     }
     
-    public void SetLessonBoardVisibility() // Not Working yet
-    {
-        //LessonBoardText.enabled = true;
-        //ExamQuestionBoardText.enabled = false;
-        //OptionAText.enabled = false;
-        //OptionBText.enabled = false;
-        //OptionCText.enabled = false;
-        //OptionDText.enabled = false;
-
-        LessonBoardText.gameObject.SetActive(false);
-        ExamQuestionBoardText.gameObject.SetActive(true);
-        OptionAText.gameObject.SetActive(true);
-        OptionBText.gameObject.SetActive(true);
-        OptionCText.gameObject.SetActive(true);
-        OptionDText.gameObject.SetActive(true);
-    }
     
-    public void SetExamBoardVisibility() // Not Working yet
-    {
-        //LessonBoardText.enabled = false;
-        //ExamQuestionBoardText.enabled = true;
-        //OptionAText.enabled = true;
-        //OptionBText.enabled = true;
-        //OptionCText.enabled = true;
-        //OptionDText.enabled = true;
-
-        LessonBoardText.gameObject.SetActive(true);
-        ExamQuestionBoardText.gameObject.SetActive(false);
-        OptionAText.gameObject.SetActive(false);
-        OptionBText.gameObject.SetActive(false);
-        OptionCText.gameObject.SetActive(false);
-        OptionDText.gameObject.SetActive(false);
-    }
 }
 public class Word
 {
@@ -248,7 +224,7 @@ public class Exam
 public class Question
 {
     public Word word;
-    int? userAnswerIndex { get; set; } // The index of user's answer
+    public int? userAnswerIndex; // The index of user's answer
     int correctAnswerIndex;
     bool? isCorrectAnswer;
     public string[] options;
