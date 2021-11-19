@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+//public enum ButtonType
+//{
+//    StartButton,
+//    OptionAButton,
+//    OptionBButton,
+//    OptionCButton,
+//    OptionDButton
+//}
+
 public class VrClassButton : MonoBehaviour
 {
     public Rigidbody buttonTopRigid;
@@ -13,12 +22,14 @@ public class VrClassButton : MonoBehaviour
     public float force = 10;
     private float upperLowerDiff;
     public bool isPressed;
-    private  bool prevPressedState;
+    private bool prevPressedState;
     public AudioSource pressedSound;
     public AudioSource releasedSound;
     public Collider[] CollidersToIgnore;
     public UnityEvent onPressed;
     public UnityEvent onReleased;
+
+    //public ButtonType buttonType = ButtonType.StartButton;
 
     public delegate void ButtonPressedHandler();
     public event ButtonPressedHandler ButtonPressed;
@@ -77,6 +88,7 @@ public class VrClassButton : MonoBehaviour
         pressedSound.pitch = 1;
         pressedSound.Play();
         onPressed.Invoke();
+        ButtonPressed?.Invoke();
     }
 
     void Released()

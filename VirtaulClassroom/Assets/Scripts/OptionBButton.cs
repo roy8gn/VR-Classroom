@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OptionBButton : OptionButton
+public class OptionBButton : VrClassButton
 {
     public delegate void OptionBButtonPressedHandler();
     public event OptionBButtonPressedHandler OptionBButtonPressed;

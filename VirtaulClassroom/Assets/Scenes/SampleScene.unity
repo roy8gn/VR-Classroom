@@ -138,6 +138,7 @@ GameObject:
   - component: {fileID: 5629921}
   - component: {fileID: 5629919}
   - component: {fileID: 5629920}
+  - component: {fileID: 5629922}
   m_Layer: 0
   m_Name: StartButtonBase
   m_TagString: Untagged
@@ -325,7 +326,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5629914}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f73f3678a97ab304b899b1075e3d8d08, type: 3}
   m_Name: 
@@ -362,6 +363,34 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &5629922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ca6662d9a8e3da489196aff236cc578, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonTopRigid: {fileID: 1183594038}
+  buttonTop: {fileID: 1183594034}
+  buttonLowerLimit: {fileID: 1823606559}
+  buttonUpperLimit: {fileID: 1468205764}
+  threshHold: 0.5
+  force: 10
+  isPressed: 0
+  pressedSound: {fileID: 5629919}
+  releasedSound: {fileID: 5629919}
+  CollidersToIgnore: []
+  onPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  onReleased:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8340574
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +750,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.26794434, y: -0.25402832}
+  m_AnchoredPosition: {x: -0.258, y: -0.25402832}
   m_SizeDelta: {x: 13.398838, y: 3.41309}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &177504166
@@ -778,7 +807,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1043,7 +1072,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1072,7 +1101,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: -0.033767942}
+  m_margin: {x: -6.4918585, y: 0, z: -5.3322115, w: -0.033767942}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -3063,7 +3092,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4532,6 +4561,9 @@ MonoBehaviour:
   OptionDText: {fileID: 0}
   startButton: {fileID: 0}
   optionAButton: {fileID: 0}
+  optionBButton: {fileID: 0}
+  optionCButton: {fileID: 0}
+  optionDButton: {fileID: 0}
   boardState: 0
   waitingForUserAnswer: 0
   secondsToWait: 3
@@ -4591,8 +4623,8 @@ MonoBehaviour:
   threshHold: 0.5
   force: 10
   isPressed: 0
-  pressedSound: {fileID: 0}
-  releasedSound: {fileID: 0}
+  pressedSound: {fileID: 1148466888}
+  releasedSound: {fileID: 1148466888}
   CollidersToIgnore: []
   onPressed:
     m_PersistentCalls:
@@ -4600,7 +4632,6 @@ MonoBehaviour:
   onReleased:
     m_PersistentCalls:
       m_Calls: []
-  ButtonName: 
 --- !u!82 &1148466888
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5082,7 +5113,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.26794434, y: 0.10101318}
+  m_AnchoredPosition: {x: -0.258, y: 0.10101318}
   m_SizeDelta: {x: 13.398838, y: 3.41309}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1249283253
@@ -5139,7 +5170,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -5274,8 +5305,8 @@ MonoBehaviour:
   threshHold: 0.5
   force: 10
   isPressed: 0
-  pressedSound: {fileID: 0}
-  releasedSound: {fileID: 0}
+  pressedSound: {fileID: 1293809097}
+  releasedSound: {fileID: 1293809097}
   CollidersToIgnore: []
   onPressed:
     m_PersistentCalls:
@@ -6137,8 +6168,8 @@ MonoBehaviour:
   threshHold: 0.5
   force: 10
   isPressed: 0
-  pressedSound: {fileID: 0}
-  releasedSound: {fileID: 0}
+  pressedSound: {fileID: 1375206635}
+  releasedSound: {fileID: 1375206635}
   CollidersToIgnore: []
   onPressed:
     m_PersistentCalls:
@@ -6412,7 +6443,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -6966,7 +6997,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484632476}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.445, y: 14.7, z: 19.45}
+  m_LocalPosition: {x: -5.65, y: 14.7, z: 19.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -7464,8 +7495,8 @@ MonoBehaviour:
   threshHold: 0.5
   force: 10
   isPressed: 0
-  pressedSound: {fileID: 0}
-  releasedSound: {fileID: 0}
+  pressedSound: {fileID: 1654561052}
+  releasedSound: {fileID: 1654561052}
   CollidersToIgnore: []
   onPressed:
     m_PersistentCalls:
@@ -7473,7 +7504,6 @@ MonoBehaviour:
   onReleased:
     m_PersistentCalls:
       m_Calls: []
-  ButtonName: 
 --- !u!82 &1654561052
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9072,6 +9102,9 @@ MonoBehaviour:
   OptionDText: {fileID: 1388510458}
   startButton: {fileID: 5629920}
   optionAButton: {fileID: 1148466887}
+  optionBButton: {fileID: 1654561051}
+  optionCButton: {fileID: 1293809096}
+  optionDButton: {fileID: 1375206634}
   boardState: 0
   waitingForUserAnswer: 0
   secondsToWait: 3

@@ -4,6 +4,8 @@ using TMPro;
 using UnityEngine;
 using System;
 using Random = System.Random;
+using static OptionAButton;
+using static StartButton;
 
 public enum BoardState
 {
@@ -24,27 +26,33 @@ public class Board : MonoBehaviour
     public TextMeshPro OptionCText;
     public TextMeshPro OptionDText;
 
-    [SerializeField] private StartButton startButton;
-    [SerializeField] private OptionAButton optionAButton;
+    [SerializeField] private VrClassButton startButton;
+    [SerializeField] private VrClassButton optionAButton;
+    [SerializeField] private VrClassButton optionBButton;
+    [SerializeField] private VrClassButton optionCButton;
+    [SerializeField] private VrClassButton optionDButton;
 
-    public BoardState boardState = BoardState.Start;
-    int sessions = 3;
-    int currentSessionIndex = 0;
-    Lesson[] lessons;
-    Exam[] exams;
+    private BoardState boardState = BoardState.Start;
+    private int sessions = 3;
+    private int currentSessionIndex = 0;
+    private Lesson[] lessons;
+    private Exam[] exams;
 
-    Lesson currentLesson;
-    Exam currentExam;
-    
-    public bool waitingForUserAnswer = false;
+    private Lesson currentLesson;
+    private Exam currentExam;
 
-    public int secondsToWait = 3;
+    private bool waitingForUserAnswer = false;
+
+    private int secondsToWait = 3;
 
     // Start is called before the first frame update
     void Start()
     {
-        startButton.StartButtonPressed += OnStartButtonPressed;
-        optionAButton.OptionAButtonPressed += OnOptionAButtonPressed;
+        //startButton.ButtonPressed += OnStartButtonPressed;
+        //optionAButton.ButtonPressed += OnOptionAButtonPressed;
+        //optionBButton.ButtonPressed += OnOptionBButtonPressed;
+        //optionCButton.ButtonPressed += OnOptionCButtonPressed;
+        //optionDButton.ButtonPressed += OnOptionDButtonPressed;
 
         LessonBoardText = GetComponentInChildren<TextMeshPro>();
         LessonBoardText.SetText("Welcome!\nPress Start to begin");
@@ -57,8 +65,8 @@ public class Board : MonoBehaviour
 
     public void OnDestroy()
     {
-        startButton.StartButtonPressed -= OnStartButtonPressed;
-        optionAButton.OptionAButtonPressed -= OnOptionAButtonPressed;
+        //startButton.ButtonPressed -= OnStartButtonPressed;
+        //optionAButton.ButtonPressed -= OnOptionAButtonPressed;
     }
 
     public void OnStartButtonPressed()
@@ -89,13 +97,15 @@ public class Board : MonoBehaviour
 
     public void OnOptionAButtonPressed()
     {
-        waitingForUserAnswer = false;
-        currentExam.questions[0].userAnswerIndex = 0;
+        //waitingForUserAnswer = false;
+        //currentExam.questions[0].userAnswerIndex = 0;
+
+        Debug.Log("A was pressed.");
     }
 
     public void OnOptionBButtonPressed()
     {
-
+        Debug.Log("B was pressed.");
     }
 
     public void OnOptionCButtonPressed()
@@ -115,7 +125,6 @@ public class Board : MonoBehaviour
 
     void StartNewLesson()
     {
-        //SetLessonBoardVisibility();
         LessonBoardText.SetText(string.Format("Lesson has started,\n be prepared..."));
         lessons[currentSessionIndex] = new Lesson();
         currentLesson = lessons[currentSessionIndex];
@@ -128,7 +137,6 @@ public class Board : MonoBehaviour
         exams[currentSessionIndex] = new Exam(lessons[currentSessionIndex].words);
         currentExam = exams[currentSessionIndex];
         BoardWaitForSeconds(secondsToWait);
-        //SetExamBoardVisibility();
         DisplayQuestionOnBoard(currentExam.questions[0]);
     }
 
@@ -167,10 +175,13 @@ public class Board : MonoBehaviour
         OptionBText.SetText(string.Format($"B. {q.options[1]}"));
         OptionCText.SetText(string.Format($"C. {q.options[2]}"));
         OptionDText.SetText(string.Format($"D. {q.options[3]}"));
+        waitingForUserAnswer = true;
     }
     
     
 }
+
+
 public class Word
 {
     public string ForiegnWord { get; set; }
@@ -187,6 +198,7 @@ public class Word
         WrongTranslations[2] = wt3;
     }
 }
+
 
 public class Lesson
 {
