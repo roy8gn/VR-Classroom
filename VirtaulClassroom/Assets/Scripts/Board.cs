@@ -4,8 +4,6 @@ using TMPro;
 using UnityEngine;
 using System;
 using Random = System.Random;
-using static OptionAButton;
-using static StartButton;
 
 public enum BoardState
 {
@@ -41,7 +39,7 @@ public class Board : MonoBehaviour
     private Lesson currentLesson;
     private Exam currentExam;
 
-    private bool waitingForUserAnswer = false;
+    private bool userAnsweredQuestion = false;
 
     private int secondsToWait = 3;
 
@@ -54,6 +52,13 @@ public class Board : MonoBehaviour
         //optionCButton.ButtonPressed += OnOptionCButtonPressed;
         //optionDButton.ButtonPressed += OnOptionDButtonPressed;
 
+        startButton?.onPressed.AddListener(OnStartButtonPressed);
+        optionAButton?.onPressed.AddListener(OnOptionAButtonPressed);
+        optionBButton?.onPressed.AddListener(OnOptionBButtonPressed);
+        optionCButton?.onPressed.AddListener(OnOptionCButtonPressed);
+        optionDButton?.onPressed.AddListener(OnOptionDButtonPressed);
+
+
         LessonBoardText = GetComponentInChildren<TextMeshPro>();
         LessonBoardText.SetText("Welcome!\nPress Start to begin");
     }
@@ -65,11 +70,14 @@ public class Board : MonoBehaviour
 
     public void OnDestroy()
     {
-        //startButton.ButtonPressed -= OnStartButtonPressed;
-        //optionAButton.ButtonPressed -= OnOptionAButtonPressed;
+        startButton?.onPressed.RemoveListener(OnStartButtonPressed);
+        optionAButton?.onPressed.RemoveListener(OnOptionAButtonPressed);
+        optionBButton?.onPressed.RemoveListener(OnOptionBButtonPressed);
+        optionCButton?.onPressed.RemoveListener(OnOptionCButtonPressed);
+        optionDButton?.onPressed.RemoveListener(OnOptionDButtonPressed);
     }
 
-    public void OnStartButtonPressed()
+    void OnStartButtonPressed()
     {
         switch (boardState)
         {
@@ -77,17 +85,17 @@ public class Board : MonoBehaviour
                 ChangeBoardStatus(BoardState.Lesson);
                 lessons = new Lesson[sessions];
                 exams = new Exam[sessions];
-                StartNewLesson();
+                StartCoroutine(RunLesson()); // Run a lesson
                 break;
 
             case BoardState.LessonEnded:
                 ChangeBoardStatus(BoardState.Exam);
-                StartNewExam();
+                StartCoroutine(RunExam());
                 break;
 
             case BoardState.ExamEnded:
                 ChangeBoardStatus(BoardState.Lesson);
-                //StartNewLesson();
+                
                 break;
 
             default:
@@ -101,6 +109,7 @@ public class Board : MonoBehaviour
         //currentExam.questions[0].userAnswerIndex = 0;
 
         Debug.Log("A was pressed.");
+        //waitingForUserAnswer = false;
     }
 
     public void OnOptionBButtonPressed()
@@ -110,12 +119,12 @@ public class Board : MonoBehaviour
 
     public void OnOptionCButtonPressed()
     {
-
+        Debug.Log("C was pressed.");
     }
 
     public void OnOptionDButtonPressed()
     {
-
+        Debug.Log("D was pressed.");
     }
 
     void ChangeBoardStatus(BoardState newState)
@@ -123,31 +132,14 @@ public class Board : MonoBehaviour
         boardState = newState;
     }
 
-    void StartNewLesson()
-    {
-        LessonBoardText.SetText(string.Format("Lesson has started,\n be prepared..."));
-        lessons[currentSessionIndex] = new Lesson();
-        currentLesson = lessons[currentSessionIndex];
-        StartCoroutine(RunLesson()); // Run a lesson
-    }
-
-    public void StartNewExam()
-    {
-        LessonBoardText.SetText(string.Format("Exam has started,\n be prepared..."));
-        exams[currentSessionIndex] = new Exam(lessons[currentSessionIndex].words);
-        currentExam = exams[currentSessionIndex];
-        BoardWaitForSeconds(secondsToWait);
-        DisplayQuestionOnBoard(currentExam.questions[0]);
-    }
-
-    private IEnumerator BoardWaitForSeconds(int sec)
-    {
-        yield return new WaitForSeconds(sec);
-    }
-
     private IEnumerator RunLesson()
     {
-        for(int i=0; i<currentLesson.words.Length; i++)
+        LessonBoardText.SetText(string.Format("Lesson has started,\n be prepared..."));
+        currentLesson = lessons[currentSessionIndex];
+        currentLesson = new Lesson();
+        
+
+        for (int i=0; i<currentLesson.words.Length; i++)
         {
             yield return new WaitForSeconds(secondsToWait);
             DisplayWordOnBoard(currentLesson.words[i]);
@@ -157,6 +149,35 @@ public class Board : MonoBehaviour
         LessonBoardText.SetText(string.Format("Lesson has ended.\nPress Start to begin the exam."));
         ChangeBoardStatus(BoardState.LessonEnded);
     }
+
+    private IEnumerator RunExam()
+    {
+        exams[currentSessionIndex] = new Exam(lessons[currentSessionIndex].words); // there is a problem here
+        currentExam = exams[currentSessionIndex];
+        
+
+        LessonBoardText.SetText(string.Format("Exam has started,\n be prepared..."));
+        yield return new WaitForSeconds(secondsToWait);
+
+        DisplayQuestionOnBoard(currentExam.questions[0]);
+        
+        if(currentSessionIndex==sessions-1)
+            ChangeBoardStatus(BoardState.End);
+        else
+        {
+            ProgressToNextSession();
+            ChangeBoardStatus(BoardState.ExamEnded);
+        }
+            
+
+        //DisplayTextOnBoard("Bye.");
+    }
+
+    public void ProgressToNextSession()
+    {
+        currentSessionIndex++;
+    }
+
     public void DisplayWordOnBoard(Word w)
     {
         LessonBoardText.SetText(string.Format($"{w.ForiegnWord} = {w.EnglishTranslation}"));
@@ -175,10 +196,18 @@ public class Board : MonoBehaviour
         OptionBText.SetText(string.Format($"B. {q.options[1]}"));
         OptionCText.SetText(string.Format($"C. {q.options[2]}"));
         OptionDText.SetText(string.Format($"D. {q.options[3]}"));
-        waitingForUserAnswer = true;
+        userAnsweredQuestion = true;
     }
-    
-    
+
+    public void DisplayTextOnBoard(string s)
+    {
+        LessonBoardText.SetText(string.Format($"{s}"));
+        ExamQuestionBoardText.SetText(string.Empty);
+        OptionAText.SetText(string.Empty);
+        OptionBText.SetText(string.Empty);
+        OptionCText.SetText(string.Empty);
+        OptionDText.SetText(string.Empty);
+    }
 }
 
 
@@ -219,6 +248,7 @@ public class Lesson
 public class Exam
 {
     public Question[] questions;
+    public Question CurrentQuestions { get; set; } 
 
     public int score;
     public Exam(Word[] w)
@@ -236,9 +266,9 @@ public class Exam
 public class Question
 {
     public Word word;
-    public int? userAnswerIndex; // The index of user's answer
+    public int userAnswerIndex; // The index of user's answer
     int correctAnswerIndex;
-    bool? isCorrectAnswer;
+    bool isCorrectAnswer;
     public string[] options;
 
     public Question(Word w)
@@ -265,6 +295,11 @@ public class Question
             else
                 i++;
         }
+    }
+
+    public void UserReply(int optionIndex)
+    {
+        userAnswerIndex = optionIndex;
     }
 
     public void CheckUserAnswer()

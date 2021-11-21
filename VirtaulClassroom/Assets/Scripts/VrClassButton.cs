@@ -88,13 +88,14 @@ public class VrClassButton : MonoBehaviour
         pressedSound.pitch = 1;
         pressedSound.Play();
         onPressed.Invoke();
+        //Debug.Log(onPressed.ToString());
         ButtonPressed?.Invoke();
     }
 
     void Released()
     {
         prevPressedState = isPressed;
-        releasedSound.pitch = Random.Range(1.1f, 1.2f);
+        releasedSound.pitch = 1;
         releasedSound.Play();
         onReleased.Invoke();
     }
