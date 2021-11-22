@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,9 +31,8 @@ public class VrClassButton : MonoBehaviour
     public UnityEvent onReleased;
 
     //public ButtonType buttonType = ButtonType.StartButton;
-
-    public delegate void ButtonPressedHandler();
-    public event ButtonPressedHandler ButtonPressed;
+    //public delegate void ButtonPressedHandler();
+    //public event ButtonPressedHandler ButtonPressed;
 
     void Start()
     {
@@ -85,18 +85,21 @@ public class VrClassButton : MonoBehaviour
     public virtual void Pressed()
     {
         prevPressedState = isPressed;
-        pressedSound.pitch = 1;
+        pressedSound.pitch = 1f;
         pressedSound.Play();
         onPressed.Invoke();
-        //Debug.Log(onPressed.ToString());
-        ButtonPressed?.Invoke();
+        //ButtonPressed?.Invoke();
     }
 
     void Released()
     {
-        prevPressedState = isPressed;
-        releasedSound.pitch = 1;
-        releasedSound.Play();
-        onReleased.Invoke();
+        try
+        {
+            prevPressedState = isPressed;
+            releasedSound.pitch = 1f;
+            releasedSound.Play();
+            onReleased.Invoke();
+        }
+        catch (ArgumentNullException) { }
     }
 }
