@@ -44,6 +44,7 @@ public class Board : MonoBehaviour
     private int currentSessionIndex = 0;
     private Lesson[] lessons;
     private Exam[] exams;
+    private Random random;
 
     private ChoiseOption UserAnswerChoiseIndex { get; set; }
     private bool WaitForUserToAnswer { get; set; }
@@ -67,7 +68,7 @@ public class Board : MonoBehaviour
 
 
         LessonBoardText = GetComponentInChildren<TextMeshPro>();
-        LessonBoardText.SetText("Welcome!\nPress Start to begin");
+        LessonBoardText.SetText("Welcome!\nPress 'Start' to begin.");
     }
 
     // Update is called once per frame
@@ -89,10 +90,11 @@ public class Board : MonoBehaviour
         switch (boardState)
         {
             case BoardState.Start:
+                random = new Random();
                 ChangeBoardStatus(BoardState.Lesson);
                 lessons = new Lesson[sessions];
                 exams = new Exam[sessions];
-                StartCoroutine(RunLesson()); // Run a lesson
+                StartCoroutine(RunLesson());
                 break;
 
             case BoardState.LessonEnded:
@@ -102,7 +104,7 @@ public class Board : MonoBehaviour
 
             case BoardState.ExamEnded:
                 ChangeBoardStatus(BoardState.Lesson);
-                
+                StartCoroutine(RunLesson());
                 break;
 
             default:
@@ -118,8 +120,11 @@ public class Board : MonoBehaviour
 
     public void UserAnswerQuestion(ChoiseOption answer)
     {
-        UserAnswerChoiseIndex = answer;
-        WaitForUserToAnswer = true;
+        if (boardState == BoardState.Exam)
+        {
+            UserAnswerChoiseIndex = answer;
+            WaitForUserToAnswer = true;   
+        }  
     }
 
     public void OnOptionAButtonPressed()
@@ -159,13 +164,13 @@ public class Board : MonoBehaviour
         }
 
         yield return new WaitForSeconds(secondsToWait);
-        LessonBoardText.SetText(string.Format("Lesson has ended.\nPress Start to begin the exam."));
+        LessonBoardText.SetText(string.Format("Lesson has ended.\nPress 'Start' to begin the exam."));
         ChangeBoardStatus(BoardState.LessonEnded);
     }
 
     private IEnumerator RunExam()
     {
-        exams[currentSessionIndex] = new Exam(GetCurrentLesson().words); // there is a problem here
+        exams[currentSessionIndex] = new Exam(GetCurrentLesson().words, random); // there is a problem here
         //SetDeafultValuesForAnswer();
 
         DisplayTextOnBoard(string.Format("Exam has started,\n be prepared..."));
@@ -283,15 +288,15 @@ public class Lesson
 
 public class Exam
 {
-    public Question[] questions; 
-
+    public Question[] questions;
     public int score;
-    public Exam(Word[] w)
+    public Exam(Word[] w, Random rand)
     {
+
         questions = new Question[w.Length];
         for(int i=0; i<w.Length; i++)
         {
-            questions[i] = new Question(w[i]);
+            questions[i] = new Question(w[i], rand);
         }
         
         score = 0;
@@ -305,18 +310,20 @@ public class Question
     private ChoiseOption CorrectAnswerIndex; // The correct answer
     private bool isCorrectAnswer;
     public string[] options; // For the display of the question on the board
+    private Random random;
 
-    public Question(Word w)
+    public Question(Word w, Random rand)
     {
         this.word = w;
         options = new string[4];
+        random = rand;
         generateQuestionOptions();
     }
 
     public void generateQuestionOptions()
     {
-        Random random = new Random();
-        CorrectAnswerIndex = (ChoiseOption) random.Next(0, 3);
+        CorrectAnswerIndex = (ChoiseOption) random.Next(0, 4);
+        Debug.Log(CorrectAnswerIndex);
         options[(int)CorrectAnswerIndex] = String.Copy(word.EnglishTranslation);
         int i = 0, j = 0;
         while(i<options.Length)
