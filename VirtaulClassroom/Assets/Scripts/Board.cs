@@ -156,14 +156,16 @@ public class Board : MonoBehaviour
     {
         DisplayTextOnBoard(string.Format("Lesson has started,\n be prepared..."));
         lessons[currentSessionIndex] = new Lesson();
-        
+        yield return new WaitForSeconds(secondsToWait);
+
         for (int i=0; i< GetCurrentLesson().words.Length; i++)
         {
-            yield return new WaitForSeconds(secondsToWait);
             DisplayWordOnBoard(GetCurrentLesson().words[i]);
+
+            yield return new WaitForSeconds(secondsToWait);
         }
 
-        yield return new WaitForSeconds(secondsToWait);
+        
         LessonBoardText.SetText(string.Format("Lesson has ended.\nPress 'Start' to begin the exam."));
         ChangeBoardStatus(BoardState.LessonEnded);
     }
