@@ -4,6 +4,13 @@ using TMPro;
 using UnityEngine;
 using System;
 using Random = System.Random;
+using System.IO;
+using System.Collections.Generic;
+public enum LessonType
+{
+    Visual,
+    Auditory
+}
 
 public enum BoardState
 {
@@ -40,8 +47,10 @@ public class Board : MonoBehaviour
     [SerializeField] private VrClassButton optionDButton;
 
     private BoardState boardState = BoardState.Start;
-    private int sessions = 3;
+    private int sessions = 2;
+    private int wordsPerSession = 10;
     private int currentSessionIndex = 0;
+    private int wrongTranslationsPerQuestion = 3;
     private Lesson[] lessons;
     private Exam[] exams;
     private Random random;
@@ -92,8 +101,7 @@ public class Board : MonoBehaviour
             case BoardState.Start:
                 random = new Random();
                 ChangeBoardStatus(BoardState.Lesson);
-                lessons = new Lesson[sessions];
-                exams = new Exam[sessions];
+                LoadWordsFromDataSets();
                 StartCoroutine(RunLesson());
                 break;
 
@@ -112,6 +120,121 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void LoadWordsFromDataSets()
+    {
+        List<Word> wordsDataSet = LoadForeignWordsFromCsvFile();
+        List<string> englishWordsDataSet = LoadEnglishWordsFromCsvFile();
+
+        int totalnumberOfWords = sessions * wordsPerSession;
+        Word[] chosenWords = ChooseWordsRandomly(wordsDataSet, totalnumberOfWords);
+        FillWordsWithWrongTranslations(chosenWords, englishWordsDataSet);
+
+        lessons = new Lesson[sessions];
+        exams = new Exam[sessions];
+
+        InitSessions(lessons, exams, chosenWords);
+    }
+
+    public void InitSessions(Lesson[] ls, Exam[] es, Word[] ws)
+    {
+        for (int i = 0; i < sessions; i++)
+        {
+            Word[] wordsForSession = new Word[wordsPerSession];
+            for (int j = 0; j < wordsPerSession; j++)
+            {
+                wordsForSession[j] = ws[i * wordsPerSession + j];
+            }
+            if (i % 2 == 0)
+            {
+                ls[i] = new Lesson(wordsForSession, LessonType.Visual);
+            }
+            else
+            {
+                ls[i] = new Lesson(wordsForSession, LessonType.Auditory);
+            }
+            es[i] = new Exam(wordsForSession, random);
+        }
+    }
+
+    public List<Word> LoadForeignWordsFromCsvFile()
+    {
+        List<Word> words = new List<Word>();
+        using (var reader = new StreamReader("./Assets/WordsDataSets/ForeignWords.csv"))
+        {
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                var values = line.Split(',');
+                try
+                {
+                    words.Add(new Word(values[0], values[1]));
+                }
+                catch (ArgumentException) { }
+            }
+        }
+        return words;
+    }
+
+    public List<string> LoadEnglishWordsFromCsvFile()
+    {
+        List<string> words = new List<string>();
+        using (var reader = new StreamReader("./Assets/WordsDataSets/EnglishWords.csv"))
+        {
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                var values = line.Split();
+                try
+                {
+                    words.Add(values[0]);
+                }
+                catch (ArgumentException) { }
+            }
+        }
+
+        return words;
+    }
+
+    public Word[] ChooseWordsRandomly(List<Word> words, int numberOfWords)
+    {
+        Word[] chosenWords = new Word[numberOfWords];
+        HashSet<int> chosenIndices = new HashSet<int>();
+        int currentRandomIndex;
+        int i = 0;
+        while (chosenIndices.Count < numberOfWords)
+        {
+            currentRandomIndex = random.Next(words.Count);
+            if (chosenIndices.Add(currentRandomIndex) == true)
+            {
+                chosenWords[i] = words[currentRandomIndex];
+                i++;
+            }
+        }
+
+        return chosenWords;
+    }
+
+    public void FillWordsWithWrongTranslations(Word[] words, List<string> englishWords)
+    {
+        int currentRandomIndex;
+        foreach (Word word in words)
+        {
+            HashSet<int> chosenIndices = new HashSet<int>();
+            string[] wrongTranslations = new string[wrongTranslationsPerQuestion];
+            int i = 0;
+            while (chosenIndices.Count < 3)
+            {
+                currentRandomIndex = random.Next(words.Length);
+                if (chosenIndices.Add(currentRandomIndex) == true)
+                {
+                    wrongTranslations[i] = englishWords[currentRandomIndex];
+                    i++;
+                }
+            }
+            word.SetWrongTranslations(wrongTranslations);
+        }
+    }
+
     public void SetDeafultValuesForAnswer()
     {
         WaitForUserToAnswer = false;
@@ -123,8 +246,8 @@ public class Board : MonoBehaviour
         if (boardState == BoardState.Exam)
         {
             UserAnswerChoiseIndex = answer;
-            WaitForUserToAnswer = true;   
-        }  
+            WaitForUserToAnswer = true;
+        }
     }
 
     public void OnOptionAButtonPressed()
@@ -155,26 +278,22 @@ public class Board : MonoBehaviour
     private IEnumerator RunLesson()
     {
         DisplayTextOnBoard(string.Format("Lesson has started,\n be prepared..."));
-        lessons[currentSessionIndex] = new Lesson();
         yield return new WaitForSeconds(secondsToWait);
 
-        for (int i=0; i< GetCurrentLesson().words.Length; i++)
+        for (int i = 0; i < GetCurrentLesson().words.Length; i++)
         {
             DisplayWordOnBoard(GetCurrentLesson().words[i]);
 
             yield return new WaitForSeconds(secondsToWait);
         }
 
-        
+
         LessonBoardText.SetText(string.Format("Lesson has ended.\nPress 'Start' to begin the exam."));
         ChangeBoardStatus(BoardState.LessonEnded);
     }
 
     private IEnumerator RunExam()
     {
-        exams[currentSessionIndex] = new Exam(GetCurrentLesson().words, random); // there is a problem here
-        //SetDeafultValuesForAnswer();
-
         DisplayTextOnBoard(string.Format("Exam has started,\n be prepared..."));
         yield return new WaitForSeconds(secondsToWait);
 
@@ -192,7 +311,7 @@ public class Board : MonoBehaviour
             ChangeBoardStatus(BoardState.End);
             DisplayTextOnBoard("Bye.");
         }
-            
+
         else
         {
             ProgressToNextSession();
@@ -251,112 +370,4 @@ public class Board : MonoBehaviour
         OptionCText.SetText(string.Empty);
         OptionDText.SetText(string.Empty);
     }
-}
-
-
-public class Word
-{
-    public string ForiegnWord { get; set; }
-    public string EnglishTranslation { get; set; }
-    public string[] WrongTranslations;
-
-    public Word(string foriegnWord, string englishTranslation, string wt1, string wt2, string wt3)
-    {
-        ForiegnWord = foriegnWord;
-        EnglishTranslation = englishTranslation;
-        WrongTranslations = new string[3];
-        WrongTranslations[0] = wt1;
-        WrongTranslations[1] = wt2;
-        WrongTranslations[2] = wt3;
-    }
-}
-
-
-public class Lesson
-{
-    public Word[] words;
-    public Lesson()
-    {
-        words = new Word[7];
-        words[0] = new Word("Perro", "Dog", "Cat", "Pig", "Crocodile");
-        words[1] = new Word("Gato", "Cat", "Avocado", "Banana", "Camel");
-        words[2] = new Word("Inglés", "English", "Hebrow", "Russian", "German");
-        words[3] = new Word("Leche", "Milk", "Liquer", "Leaf", "Coca-Cola");
-        words[4] = new Word("Naranja", "Orange", "Narnia", "Jump", "Case");
-        words[5] = new Word("Rojo", "Red", "Orange", "Rooster", "Rain");
-        words[6] = new Word("Agua", "Water", "Door", "Milk", "Chair");
-    }
-}
-
-public class Exam
-{
-    public Question[] questions;
-    public int score;
-    public Exam(Word[] w, Random rand)
-    {
-
-        questions = new Question[w.Length];
-        for(int i=0; i<w.Length; i++)
-        {
-            questions[i] = new Question(w[i], rand);
-        }
-        
-        score = 0;
-    }
-}
-
-public class Question
-{
-    public Word word;
-    private ChoiseOption UserAnswer; // User's answer
-    private ChoiseOption CorrectAnswerIndex; // The correct answer
-    private bool isCorrectAnswer;
-    public string[] options; // For the display of the question on the board
-    private Random random;
-
-    public Question(Word w, Random rand)
-    {
-        this.word = w;
-        options = new string[4];
-        random = rand;
-        generateQuestionOptions();
-    }
-
-    public void generateQuestionOptions()
-    {
-        CorrectAnswerIndex = (ChoiseOption) random.Next(0, 4);
-        Debug.Log(CorrectAnswerIndex);
-        options[(int)CorrectAnswerIndex] = String.Copy(word.EnglishTranslation);
-        int i = 0, j = 0;
-        while(i<options.Length)
-        {
-            if (i != (int)CorrectAnswerIndex)
-            {
-                options[i] = word.WrongTranslations[j];
-                i++;
-                j++;
-            }
-            else
-                i++;
-        }
-    }
-
-    public void CheckUserAnswer()
-    {
-        if (UserAnswer == CorrectAnswerIndex)
-            isCorrectAnswer = true;
-        else
-            isCorrectAnswer = false;
-    }
-
-    public void UserAnswerQuestion(ChoiseOption answer)
-    {
-        UserAnswer = answer;
-    }
-
-    public bool IsAnswerCorrect()
-    {
-        return isCorrectAnswer;
-    }
-
 }
