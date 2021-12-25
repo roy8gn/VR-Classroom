@@ -5,31 +5,6 @@ using UnityEngine;
 using System;
 using Random = System.Random;
 using System.IO;
-using System.Collections.Generic;
-public enum LessonType
-{
-    Visual,
-    Auditory
-}
-
-public enum BoardState
-{
-    Start,
-    Lesson,
-    LessonEnded,
-    Exam,
-    ExamEnded,
-    End
-}
-
-public enum ChoiseOption
-{
-    A = 0,
-    B = 1,
-    C = 2,
-    D = 3,
-    Empty = -1
-}
 
 public class Board : MonoBehaviour
 {
@@ -63,12 +38,6 @@ public class Board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //startButton.ButtonPressed += OnStartButtonPressed;
-        //optionAButton.ButtonPressed += OnOptionAButtonPressed;
-        //optionBButton.ButtonPressed += OnOptionBButtonPressed;
-        //optionCButton.ButtonPressed += OnOptionCButtonPressed;
-        //optionDButton.ButtonPressed += OnOptionDButtonPressed;
-
         startButton?.onPressed.AddListener(OnStartButtonPressed);
         optionAButton?.onPressed.AddListener(OnOptionAButtonPressed);
         optionBButton?.onPressed.AddListener(OnOptionBButtonPressed);
@@ -303,7 +272,7 @@ public class Board : MonoBehaviour
             DisplayQuestionOnBoard(q);
             yield return new WaitUntil(() => WaitForUserToAnswer);
             HandleUserAnswer(q);
-            Debug.Log(string.Format($"Question is {q.IsAnswerCorrect()}"));
+            Debug.Log(string.Format($"Question is {q.IsAnswerCorrect}"));
         }
 
         if (currentSessionIndex == sessions - 1)
@@ -371,3 +340,29 @@ public class Board : MonoBehaviour
         OptionDText.SetText(string.Empty);
     }
 }
+
+public enum LessonType
+{
+    Visual,
+    Auditory
+}
+
+public enum BoardState
+{
+    Start,
+    Lesson,
+    LessonEnded,
+    Exam,
+    ExamEnded,
+    End
+}
+
+public enum ChoiseOption
+{
+    A = 0,
+    B = 1,
+    C = 2,
+    D = 3,
+    Empty = -1
+}
+

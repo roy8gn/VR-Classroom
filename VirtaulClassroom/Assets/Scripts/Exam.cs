@@ -6,7 +6,9 @@ using Random = System.Random;
 public class Exam
 {
     public Question[] questions;
-    public int score;
+
+    public int Score { get; set; }
+    
     public Exam(Word[] w, Random rand)
     {
 
@@ -16,6 +18,17 @@ public class Exam
             questions[i] = new Question(w[i], rand);
         }
 
-        score = 0;
+        Score = 0;
+    }
+
+    public void CalculateScore()
+    {
+        foreach(Question q in questions)
+        {
+            if (q.IsAnswerCorrect)
+            {
+                Score = Score + (100 / questions.Length);
+            }
+        }
     }
 }

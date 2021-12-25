@@ -6,9 +6,9 @@ using Random = System.Random;
 public class Question
 {
     public Word word;
-    private ChoiseOption UserAnswer; // User's answer
+    public ChoiseOption UserAnswer { get; set; } // User's answer
     private ChoiseOption CorrectAnswerIndex; // The correct answer
-    private bool isCorrectAnswer;
+    public bool IsAnswerCorrect { get; set; }
     public string[] options; // For the display of the question on the board
     private Random random;
 
@@ -42,19 +42,13 @@ public class Question
     public void CheckUserAnswer()
     {
         if (UserAnswer == CorrectAnswerIndex)
-            isCorrectAnswer = true;
+            IsAnswerCorrect = true;
         else
-            isCorrectAnswer = false;
+            IsAnswerCorrect = false;
     }
 
     public void UserAnswerQuestion(ChoiseOption answer)
     {
         UserAnswer = answer;
     }
-
-    public bool IsAnswerCorrect()
-    {
-        return isCorrectAnswer;
-    }
-
 }
