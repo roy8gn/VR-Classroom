@@ -21,6 +21,15 @@ public class Board : MonoBehaviour
     [SerializeField] private VrClassButton optionCButton;
     [SerializeField] private VrClassButton optionDButton;
 
+    //AudioSource[] audioSources = Object.FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
+    public AudioSource DogBark;
+    public AudioSource PhoneNoise;
+    public AudioSource Bus;
+    public AudioSource PaperFold;
+    public AudioSource PenClick;
+    public AudioSource Ambulance;
+
+
     private BoardState boardState = BoardState.Start;
     private int sessions = 2;
     private int wordsPerSession = 10;
@@ -89,6 +98,25 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void FillWordsWithAudio(Word[] words)
+    {
+        AudioSource[] audioSources = new AudioSource[6];
+        audioSources[0] = DogBark;
+        audioSources[1] = PhoneNoise;
+        audioSources[2] = PenClick;
+        audioSources[3] = Ambulance;
+        audioSources[4] = PaperFold;
+        audioSources[5] = Bus;
+        int currentRandomIndex;
+        for (int i = 0; i < words.Length; i++)
+        {
+            currentRandomIndex = random.Next(audioSources.Length);
+            words[i].WordDist = new AudioDistraction(audioSources[currentRandomIndex]);
+        }
+
+
+    }
+
     public void LoadWordsFromDataSets()
     {
         List<Word> wordsDataSet = LoadForeignWordsFromCsvFile();
@@ -97,6 +125,7 @@ public class Board : MonoBehaviour
         int totalnumberOfWords = sessions * wordsPerSession;
         Word[] chosenWords = ChooseWordsRandomly(wordsDataSet, totalnumberOfWords);
         FillWordsWithWrongTranslations(chosenWords, englishWordsDataSet);
+        FillWordsWithAudio(chosenWords);
 
         lessons = new Lesson[sessions];
         exams = new Exam[sessions];
@@ -252,7 +281,7 @@ public class Board : MonoBehaviour
         for (int i = 0; i < GetCurrentLesson().words.Length; i++)
         {
             DisplayWordOnBoard(GetCurrentLesson().words[i]);
-
+            GetCurrentLesson().words[i].WordDist.InitDistraction();
             yield return new WaitForSeconds(secondsToWait);
         }
 
