@@ -4,10 +4,7 @@ using UnityEngine;
 
 public abstract class Distraction
 {
-    enum type { Visual, Auditory, Mixed}
+    public abstract void StartDistraction();
 
-    public abstract void InitDistraction();
-
-    
-    
+    public abstract void StopDistraction();
 }

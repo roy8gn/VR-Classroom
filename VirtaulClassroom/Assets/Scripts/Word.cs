@@ -7,7 +7,7 @@ public class Word
     public string ForiegnWord { get; set; }
     public string EnglishTranslation { get; set; }
     public string[] WrongTranslations;
-    public Distraction WordDist { get; set; }
+    public Distraction WordDistraction { get; set; }
 
     public Word(string foriegnWord, string englishTranslation, string[] wt)
     {
@@ -29,6 +29,7 @@ public class Word
         {
             WrongTranslations[i] = w.WrongTranslations[i];
         }
+        WordDistraction = w.WordDistraction;
     }
 
     public Word(string fw, string ew)

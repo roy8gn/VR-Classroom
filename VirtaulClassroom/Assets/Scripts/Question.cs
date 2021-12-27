@@ -6,8 +6,8 @@ using Random = System.Random;
 public class Question
 {
     public Word word;
-    public ChoiseOption UserAnswer { get; set; } // User's answer
-    private ChoiseOption CorrectAnswerIndex; // The correct answer
+    public ChoiceOption UserAnswer { get; set; } // User's answer
+    private ChoiceOption CorrectAnswerIndex; // The correct answer
     public bool IsAnswerCorrect { get; set; }
     public string[] options; // For the display of the question on the board
     private Random random;
@@ -22,8 +22,8 @@ public class Question
 
     public void generateQuestionOptions()
     {
-        CorrectAnswerIndex = (ChoiseOption)random.Next(0, 4);
-        Debug.Log(CorrectAnswerIndex);
+        CorrectAnswerIndex = (ChoiceOption)random.Next(0, 4);
+        //Debug.Log(CorrectAnswerIndex);
         options[(int)CorrectAnswerIndex] = string.Copy(word.EnglishTranslation);
         int i = 0, j = 0;
         while (i < options.Length)
@@ -47,7 +47,7 @@ public class Question
             IsAnswerCorrect = false;
     }
 
-    public void UserAnswerQuestion(ChoiseOption answer)
+    public void UserAnswerQuestion(ChoiceOption answer)
     {
         UserAnswer = answer;
     }

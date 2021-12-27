@@ -29,6 +29,7 @@ public class Board : MonoBehaviour
     public AudioSource PenClick;
     public AudioSource Ambulance;
 
+    public Transform HeadTracker;
 
     private BoardState boardState = BoardState.Start;
     private int sessions = 2;
@@ -39,7 +40,7 @@ public class Board : MonoBehaviour
     private Exam[] exams;
     private Random random;
 
-    private ChoiseOption UserAnswerChoiseIndex { get; set; }
+    private ChoiceOption UserAnswerChoiceIndex { get; set; }
     private bool WaitForUserToAnswer { get; set; }
 
     private int secondsToWait = 3;
@@ -96,25 +97,6 @@ public class Board : MonoBehaviour
             default:
                 break;
         }
-    }
-
-    public void FillWordsWithAudio(Word[] words)
-    {
-        AudioSource[] audioSources = new AudioSource[6];
-        audioSources[0] = DogBark;
-        audioSources[1] = PhoneNoise;
-        audioSources[2] = PenClick;
-        audioSources[3] = Ambulance;
-        audioSources[4] = PaperFold;
-        audioSources[5] = Bus;
-        int currentRandomIndex;
-        for (int i = 0; i < words.Length; i++)
-        {
-            currentRandomIndex = random.Next(audioSources.Length);
-            words[i].WordDist = new AudioDistraction(audioSources[currentRandomIndex]);
-        }
-
-
     }
 
     public void LoadWordsFromDataSets()
@@ -233,39 +215,56 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void FillWordsWithAudio(Word[] words)
+    {
+        AudioSource[] audioSources = new AudioSource[6];
+        audioSources[0] = DogBark;
+        audioSources[1] = PhoneNoise;
+        audioSources[2] = PenClick;
+        audioSources[3] = Ambulance;
+        audioSources[4] = PaperFold;
+        audioSources[5] = Bus;
+        int currentRandomIndex;
+        for (int i = 0; i < words.Length; i++)
+        {
+            currentRandomIndex = random.Next(audioSources.Length);
+            words[i].WordDistraction = new AudioDistraction(audioSources[currentRandomIndex]);
+        }
+    }
+
     public void SetDeafultValuesForAnswer()
     {
         WaitForUserToAnswer = false;
-        UserAnswerChoiseIndex = ChoiseOption.Empty;
+        UserAnswerChoiceIndex = ChoiceOption.Empty;
     }
 
-    public void UserAnswerQuestion(ChoiseOption answer)
+    public void UserAnswerQuestion(ChoiceOption answer)
     {
         if (boardState == BoardState.Exam)
         {
-            UserAnswerChoiseIndex = answer;
+            UserAnswerChoiceIndex = answer;
             WaitForUserToAnswer = true;
         }
     }
 
     public void OnOptionAButtonPressed()
     {
-        UserAnswerQuestion(ChoiseOption.A);
+        UserAnswerQuestion(ChoiceOption.A);
     }
 
     public void OnOptionBButtonPressed()
     {
-        UserAnswerQuestion(ChoiseOption.B);
+        UserAnswerQuestion(ChoiceOption.B);
     }
 
     public void OnOptionCButtonPressed()
     {
-        UserAnswerQuestion(ChoiseOption.C);
+        UserAnswerQuestion(ChoiceOption.C);
     }
 
     public void OnOptionDButtonPressed()
     {
-        UserAnswerQuestion(ChoiseOption.D);
+        UserAnswerQuestion(ChoiceOption.D);
     }
 
     void ChangeBoardStatus(BoardState newState)
@@ -281,7 +280,7 @@ public class Board : MonoBehaviour
         for (int i = 0; i < GetCurrentLesson().words.Length; i++)
         {
             DisplayWordOnBoard(GetCurrentLesson().words[i]);
-            GetCurrentLesson().words[i].WordDist.InitDistraction();
+            GetCurrentLesson().words[i].WordDistraction.StartDistraction();
             yield return new WaitForSeconds(secondsToWait);
         }
 
@@ -320,7 +319,7 @@ public class Board : MonoBehaviour
 
     public void HandleUserAnswer(Question q)
     {
-        q.UserAnswerQuestion(UserAnswerChoiseIndex);
+        q.UserAnswerQuestion(UserAnswerChoiceIndex);
         q.CheckUserAnswer();
     }
 
@@ -386,7 +385,7 @@ public enum BoardState
     End
 }
 
-public enum ChoiseOption
+public enum ChoiceOption
 {
     A = 0,
     B = 1,

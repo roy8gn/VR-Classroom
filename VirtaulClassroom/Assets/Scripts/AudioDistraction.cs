@@ -7,13 +7,18 @@ public class AudioDistraction : Distraction
     AudioSource sound;
 
     public AudioDistraction(AudioSource asource)
-    {
-        //this.type = 'Auditory'; 
+    { 
         sound = asource;
     }
 
-    public override void InitDistraction()
+    public override void StartDistraction()
     {
         sound.Play();
+    }
+
+
+    public override void StopDistraction()
+    {
+        
     }
 }

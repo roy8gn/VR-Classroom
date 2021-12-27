@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class VisualDistraction : Distraction
 {
-    public override void InitDistraction()
+    public override void StartDistraction()
     {
-
+        
     }
 
-
+    public override void StopDistraction()
+    {
+        
+    }
 }
