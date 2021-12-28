@@ -19,6 +19,6 @@ public class AudioDistraction : Distraction
 
     public override void StopDistraction()
     {
-        
+        sound.Stop();
     }
 }

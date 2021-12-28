@@ -21,7 +21,6 @@ public class Board : MonoBehaviour
     [SerializeField] private VrClassButton optionCButton;
     [SerializeField] private VrClassButton optionDButton;
 
-    //AudioSource[] audioSources = Object.FindObjectsOfType(typeof(AudioSource)) as AudioSource[];
     public AudioSource DogBark;
     public AudioSource PhoneNoise;
     public AudioSource Bus;
@@ -39,6 +38,8 @@ public class Board : MonoBehaviour
     private Lesson[] lessons;
     private Exam[] exams;
     private Random random;
+    VisualDistraction[] visualDistractions;
+    AudioDistraction[] audioDistractions;
 
     private ChoiceOption UserAnswerChoiceIndex { get; set; }
     private bool WaitForUserToAnswer { get; set; }
@@ -54,7 +55,6 @@ public class Board : MonoBehaviour
         optionCButton?.onPressed.AddListener(OnOptionCButtonPressed);
         optionDButton?.onPressed.AddListener(OnOptionDButtonPressed);
 
-
         LessonBoardText = GetComponentInChildren<TextMeshPro>();
         LessonBoardText.SetText("Welcome!\nPress 'Start' to begin.");
     }
@@ -62,6 +62,12 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        try
+        {
+            Debug.Log(HeadTracker.transform.rotation);
+        }
+        catch (UnassignedReferenceException) { }
+        
     }
 
     public void OnDestroy()
@@ -78,6 +84,7 @@ public class Board : MonoBehaviour
         switch (boardState)
         {
             case BoardState.Start:
+                
                 random = new Random();
                 ChangeBoardStatus(BoardState.Lesson);
                 LoadWordsFromDataSets();
@@ -108,6 +115,7 @@ public class Board : MonoBehaviour
         Word[] chosenWords = ChooseWordsRandomly(wordsDataSet, totalnumberOfWords);
         FillWordsWithWrongTranslations(chosenWords, englishWordsDataSet);
         FillWordsWithAudio(chosenWords);
+        //FillWordsWithVisualDistractions(chosenWords);
 
         lessons = new Lesson[sessions];
         exams = new Exam[sessions];
@@ -124,14 +132,8 @@ public class Board : MonoBehaviour
             {
                 wordsForSession[j] = ws[i * wordsPerSession + j];
             }
-            if (i % 2 == 0)
-            {
-                ls[i] = new Lesson(wordsForSession, LessonType.Visual);
-            }
-            else
-            {
-                ls[i] = new Lesson(wordsForSession, LessonType.Auditory);
-            }
+            LessonType lt = i % 2 == 0 ? LessonType.Visual : LessonType.Auditory;
+            ls[i] = new Lesson(wordsForSession, lt);
             es[i] = new Exam(wordsForSession, random);
         }
     }
@@ -196,7 +198,6 @@ public class Board : MonoBehaviour
 
     public void FillWordsWithWrongTranslations(Word[] words, List<string> englishWords)
     {
-        int currentRandomIndex;
         foreach (Word word in words)
         {
             HashSet<int> chosenIndices = new HashSet<int>();
@@ -204,7 +205,7 @@ public class Board : MonoBehaviour
             int i = 0;
             while (chosenIndices.Count < 3)
             {
-                currentRandomIndex = random.Next(words.Length);
+                int currentRandomIndex = random.Next(words.Length);
                 if (chosenIndices.Add(currentRandomIndex) == true)
                 {
                     wrongTranslations[i] = englishWords[currentRandomIndex];
@@ -217,18 +218,55 @@ public class Board : MonoBehaviour
 
     public void FillWordsWithAudio(Word[] words)
     {
-        AudioSource[] audioSources = new AudioSource[6];
-        audioSources[0] = DogBark;
-        audioSources[1] = PhoneNoise;
-        audioSources[2] = PenClick;
-        audioSources[3] = Ambulance;
-        audioSources[4] = PaperFold;
-        audioSources[5] = Bus;
-        int currentRandomIndex;
+        audioDistractions = new AudioDistraction[6];
+        audioDistractions[0] = new AudioDistraction(DogBark);
+        audioDistractions[1] = new AudioDistraction(PhoneNoise);
+        audioDistractions[2] = new AudioDistraction(PenClick);
+        audioDistractions[3] = new AudioDistraction(Ambulance);
+        audioDistractions[4] = new AudioDistraction(PaperFold);
+        audioDistractions[5] = new AudioDistraction(Bus);
+
         for (int i = 0; i < words.Length; i++)
         {
-            currentRandomIndex = random.Next(audioSources.Length);
-            words[i].WordDistraction = new AudioDistraction(audioSources[currentRandomIndex]);
+            int currentRandomIndex = random.Next(audioDistractions.Length);
+            words[i].WordDistraction = audioDistractions[currentRandomIndex];
+        }
+    }
+
+    public void FillWordsWithVisualDistractions(Word[] words)
+    {
+        VisualDistraction[] visualDistractions = new VisualDistraction[5];
+        
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        sphere.AddComponent<Rigidbody>();
+        sphere.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
+
+        GameObject capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        capsule.AddComponent<Rigidbody>();
+        capsule.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
+
+        GameObject cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        cylinder.AddComponent<Rigidbody>();
+        cylinder.GetComponent<Renderer>().material.SetColor("_Color", Color.green);
+
+        GameObject square1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        square1.AddComponent<Rigidbody>();
+        square1.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
+
+        GameObject square2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        square2.AddComponent<Rigidbody>();
+        square2.GetComponent<Renderer>().material.SetColor("_Color", Color.cyan);
+
+        visualDistractions[0] = new VisualDistraction(sphere, new Vector3(27, 15, 10), new Vector3(5, 5, 5), new Vector3(-20, 0, 5));
+        visualDistractions[1] = new VisualDistraction(capsule, new Vector3(-27, 15, 10), new Vector3(2, 2, 2), new Vector3(20, 0, 5));
+        visualDistractions[2] = new VisualDistraction(cylinder, new Vector3(0, 15, 20), new Vector3(1, 1, 1), new Vector3(3, 0, -10));
+        visualDistractions[3] = new VisualDistraction(square1, new Vector3(0, 15, 10), new Vector3(4, 1, 1), new Vector3(0, 0, 5));
+        visualDistractions[4] = new VisualDistraction(square1, new Vector3(0, 25, 20), new Vector3(1, 4, 4), new Vector3(0, 0, 0));
+
+        for (int i = 0; i < words.Length; i++)
+        {
+            int currentRandomIndex = random.Next(visualDistractions.Length);
+            words[i].WordDistraction = visualDistractions[currentRandomIndex];
         }
     }
 
@@ -249,22 +287,26 @@ public class Board : MonoBehaviour
 
     public void OnOptionAButtonPressed()
     {
-        UserAnswerQuestion(ChoiceOption.A);
+        if(boardState==BoardState.Exam)
+            UserAnswerQuestion(ChoiceOption.A);
     }
 
     public void OnOptionBButtonPressed()
     {
-        UserAnswerQuestion(ChoiceOption.B);
+        if (boardState == BoardState.Exam)
+            UserAnswerQuestion(ChoiceOption.B);
     }
 
     public void OnOptionCButtonPressed()
     {
-        UserAnswerQuestion(ChoiceOption.C);
+        if (boardState == BoardState.Exam)
+            UserAnswerQuestion(ChoiceOption.C);
     }
 
     public void OnOptionDButtonPressed()
     {
-        UserAnswerQuestion(ChoiceOption.D);
+        if (boardState == BoardState.Exam)
+            UserAnswerQuestion(ChoiceOption.D);
     }
 
     void ChangeBoardStatus(BoardState newState)
@@ -280,10 +322,11 @@ public class Board : MonoBehaviour
         for (int i = 0; i < GetCurrentLesson().words.Length; i++)
         {
             DisplayWordOnBoard(GetCurrentLesson().words[i]);
+
             GetCurrentLesson().words[i].WordDistraction.StartDistraction();
             yield return new WaitForSeconds(secondsToWait);
+            GetCurrentLesson().words[i].WordDistraction.StopDistraction();
         }
-
 
         LessonBoardText.SetText(string.Format("Lesson has ended.\nPress 'Start' to begin the exam."));
         ChangeBoardStatus(BoardState.LessonEnded);
@@ -303,6 +346,8 @@ public class Board : MonoBehaviour
             Debug.Log(string.Format($"Question is {q.IsAnswerCorrect}"));
         }
 
+        GetCurrentExam().CalculateScore();
+
         if (currentSessionIndex == sessions - 1)
         {
             ChangeBoardStatus(BoardState.End);
@@ -314,6 +359,8 @@ public class Board : MonoBehaviour
             ProgressToNextSession();
             ChangeBoardStatus(BoardState.ExamEnded);
             DisplayTextOnBoard("Exam ended.\nPress 'Start' for a new Lesson.");
+
+            Debug.Log("Score for this rest: " + GetCurrentExam().Score);
         }
     }
 
@@ -366,6 +413,13 @@ public class Board : MonoBehaviour
         OptionBText.SetText(string.Empty);
         OptionCText.SetText(string.Empty);
         OptionDText.SetText(string.Empty);
+    }
+
+    public void GenerateDistrctions()
+    {
+        
+
+        
     }
 }
 
