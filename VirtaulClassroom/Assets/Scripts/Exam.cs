@@ -7,7 +7,7 @@ public class Exam
 {
     public Question[] questions;
 
-    public int Score { get; set; }
+    public double Score { get; set; }
     
     public Exam(Word[] w, Random rand)
     {
@@ -25,7 +25,8 @@ public class Exam
     {
         foreach(Question q in questions)
         {
-            if (q.IsAnswerCorrect)
+            Debug.Log("Question is " + q.IsAnswerCorrect);
+            if (q.IsAnswerCorrect == true)
             {
                 Score = Score + (100 / questions.Length);
             }

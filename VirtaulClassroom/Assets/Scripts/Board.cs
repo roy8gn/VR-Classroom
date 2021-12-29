@@ -27,13 +27,19 @@ public class Board : MonoBehaviour
     public AudioSource PaperFold;
     public AudioSource PenClick;
     public AudioSource Ambulance;
+    public AudioSource FireWorks;
+    public AudioSource Tractor;
+    public AudioSource Hammering;
+    public AudioSource PhoneTyping;
+    
 
     public Transform HeadTracker;
 
     private BoardState boardState = BoardState.Start;
-    private int sessions = 2;
+    private int sessions = 3;
     private int wordsPerSession = 10;
     private int currentSessionIndex = 0;
+    private int distractionTypes = 3; // Visual, Auditory, None
     private int wrongTranslationsPerQuestion = 3;
     private Lesson[] lessons;
     private Exam[] exams;
@@ -62,12 +68,12 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        try
+        /*try
         {
             Debug.Log(HeadTracker.transform.rotation);
         }
         catch (UnassignedReferenceException) { }
-        
+        */
     }
 
     public void OnDestroy()
@@ -114,8 +120,6 @@ public class Board : MonoBehaviour
         int totalnumberOfWords = sessions * wordsPerSession;
         Word[] chosenWords = ChooseWordsRandomly(wordsDataSet, totalnumberOfWords);
         FillWordsWithWrongTranslations(chosenWords, englishWordsDataSet);
-        FillWordsWithAudio(chosenWords);
-        //FillWordsWithVisualDistractions(chosenWords);
 
         lessons = new Lesson[sessions];
         exams = new Exam[sessions];
@@ -125,6 +129,7 @@ public class Board : MonoBehaviour
 
     public void InitSessions(Lesson[] ls, Exam[] es, Word[] ws)
     {
+        Dictionary<int, DistractionTypeForLesson> dict = RandomOrderOfDistractions();
         for (int i = 0; i < sessions; i++)
         {
             Word[] wordsForSession = new Word[wordsPerSession];
@@ -132,10 +137,28 @@ public class Board : MonoBehaviour
             {
                 wordsForSession[j] = ws[i * wordsPerSession + j];
             }
-            LessonType lt = i % 2 == 0 ? LessonType.Visual : LessonType.Auditory;
-            ls[i] = new Lesson(wordsForSession, lt);
+            DistractionTypeForLesson distractionForLesson = dict[i % distractionTypes];
+            FillWordsWithDistractions(wordsForSession, distractionForLesson);
+            ls[i] = new Lesson(wordsForSession, LessonType.Visual, distractionForLesson);
             es[i] = new Exam(wordsForSession, random);
         }
+    }
+
+    
+    public Dictionary<int, DistractionTypeForLesson> RandomOrderOfDistractions()
+    {
+        Dictionary<int, DistractionTypeForLesson> dict = new Dictionary<int, DistractionTypeForLesson>();
+        HashSet<int> randomIndecies = new HashSet<int>();
+        foreach (DistractionTypeForLesson dt in Enum.GetValues(typeof(DistractionTypeForLesson)))
+        {
+            int randomIndex = random.Next(distractionTypes);
+            while (randomIndecies.Add(randomIndex) == false) {
+                randomIndex = random.Next(distractionTypes);
+            }
+            dict.Add(randomIndex, dt);
+        }
+
+        return dict;
     }
 
     public List<Word> LoadForeignWordsFromCsvFile()
@@ -216,15 +239,48 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void FillWordsWithAudio(Word[] words)
+    public void FillWordsWithDistractions(Word[] words, DistractionTypeForLesson dt)
     {
-        audioDistractions = new AudioDistraction[6];
+        switch (dt)
+        {
+            case DistractionTypeForLesson.Auditory:
+                FillWordsWithAudioDistractions(words);
+                break;
+            case DistractionTypeForLesson.Visual:
+                FillWordsWithVisualDistractions(words);
+                break;
+            case DistractionTypeForLesson.None:
+                FillWordsWithNoDistractions(words);
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    public void FillWordsWithNoDistractions(Word[] words)
+    {
+        NoDistraction nd = new NoDistraction();
+        foreach(Word w in words)
+        {
+            w.WordDistraction = nd;
+        }
+    }
+
+
+    public void FillWordsWithAudioDistractions(Word[] words)
+    {
+        audioDistractions = new AudioDistraction[10];
         audioDistractions[0] = new AudioDistraction(DogBark);
         audioDistractions[1] = new AudioDistraction(PhoneNoise);
         audioDistractions[2] = new AudioDistraction(PenClick);
         audioDistractions[3] = new AudioDistraction(Ambulance);
         audioDistractions[4] = new AudioDistraction(PaperFold);
         audioDistractions[5] = new AudioDistraction(Bus);
+        audioDistractions[6] = new AudioDistraction(FireWorks);
+        audioDistractions[7] = new AudioDistraction(Tractor);
+        audioDistractions[8] = new AudioDistraction(Hammering);
+        audioDistractions[9] = new AudioDistraction(PhoneTyping);
 
         for (int i = 0; i < words.Length; i++)
         {
@@ -343,7 +399,6 @@ public class Board : MonoBehaviour
             DisplayQuestionOnBoard(q);
             yield return new WaitUntil(() => WaitForUserToAnswer);
             HandleUserAnswer(q);
-            Debug.Log(string.Format($"Question is {q.IsAnswerCorrect}"));
         }
 
         GetCurrentExam().CalculateScore();
@@ -359,8 +414,6 @@ public class Board : MonoBehaviour
             ProgressToNextSession();
             ChangeBoardStatus(BoardState.ExamEnded);
             DisplayTextOnBoard("Exam ended.\nPress 'Start' for a new Lesson.");
-
-            Debug.Log("Score for this rest: " + GetCurrentExam().Score);
         }
     }
 
@@ -414,19 +467,19 @@ public class Board : MonoBehaviour
         OptionCText.SetText(string.Empty);
         OptionDText.SetText(string.Empty);
     }
-
-    public void GenerateDistrctions()
-    {
-        
-
-        
-    }
 }
 
 public enum LessonType
 {
     Visual,
     Auditory
+}
+
+public enum DistractionTypeForLesson
+{
+    Visual,
+    Auditory,
+    None
 }
 
 public enum BoardState
