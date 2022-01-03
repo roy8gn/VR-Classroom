@@ -17,21 +17,20 @@ public class VisualDistraction : Distraction
         objectSize = os;
         force = f;
 
-        //DistractionObject.AddComponent<Rigidbody>();
         DistractionObject.SetActive(false);
-        
         DistractionObject.transform.localScale = objectSize;
     }
 
     public override void StartDistraction()
     {
-        DistractionObject.SetActive(true);
         DistractionObject.transform.position = objectPosition;
+        DistractionObject.SetActive(true);
         DistractionObject.GetComponent<Rigidbody>().AddForce(force.x, force.y, force.z, ForceMode.Impulse);
     }
 
     public override void StopDistraction()
     {
         DistractionObject.SetActive(false);
+        DistractionObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
     }
 }

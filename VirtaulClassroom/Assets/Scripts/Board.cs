@@ -32,8 +32,8 @@ public class Board : MonoBehaviour
     public AudioSource Hammering;
     public AudioSource PhoneTyping;
     
-
     public Transform HeadTracker;
+    public bool HeadOutOfRange = false;
 
     private BoardState boardState = BoardState.Start;
     private int sessions = 3;
@@ -68,12 +68,21 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*try
+
+        try
         {
-            Debug.Log(HeadTracker.transform.rotation);
+            if (HeadTracker.rotation.y > -0.35 && HeadTracker.rotation.y < 0.35 && HeadTracker.rotation.x > -0.2 && HeadTracker.rotation.x < 0.2)
+            {
+                //Debug.Log("In Range");
+            }
+            else
+            {
+                HeadOutOfRange = true;
+                //Debug.Log("Out Of Range");
+            }
         }
-        catch (UnassignedReferenceException) { }
-        */
+        catch(Exception) { }
+        
     }
 
     public void OnDestroy()
@@ -90,10 +99,9 @@ public class Board : MonoBehaviour
         switch (boardState)
         {
             case BoardState.Start:
-                
                 random = new Random();
-                ChangeBoardStatus(BoardState.Lesson);
                 LoadWordsFromDataSets();
+                ChangeBoardStatus(BoardState.Lesson);
                 StartCoroutine(RunLesson());
                 break;
 
@@ -105,6 +113,10 @@ public class Board : MonoBehaviour
             case BoardState.ExamEnded:
                 ChangeBoardStatus(BoardState.Lesson);
                 StartCoroutine(RunLesson());
+                break;
+
+            case BoardState.End:
+                AnalyzeResults();
                 break;
 
             default:
@@ -138,7 +150,7 @@ public class Board : MonoBehaviour
                 wordsForSession[j] = ws[i * wordsPerSession + j];
             }
             DistractionTypeForLesson distractionForLesson = dict[i % distractionTypes];
-            FillWordsWithDistractions(wordsForSession, distractionForLesson);
+            FillWordsWithDistractions(wordsForSession, /*distractionForLesson */ DistractionTypeForLesson.Visual);
             ls[i] = new Lesson(wordsForSession, LessonType.Visual, distractionForLesson);
             es[i] = new Exam(wordsForSession, random);
         }
@@ -291,7 +303,7 @@ public class Board : MonoBehaviour
 
     public void FillWordsWithVisualDistractions(Word[] words)
     {
-        VisualDistraction[] visualDistractions = new VisualDistraction[5];
+        visualDistractions = new VisualDistraction[7];
         
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.AddComponent<Rigidbody>();
@@ -313,11 +325,18 @@ public class Board : MonoBehaviour
         square2.AddComponent<Rigidbody>();
         square2.GetComponent<Renderer>().material.SetColor("_Color", Color.cyan);
 
+        GameObject ball = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        ball.AddComponent<Rigidbody>();
+        ball.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
+
         visualDistractions[0] = new VisualDistraction(sphere, new Vector3(27, 15, 10), new Vector3(5, 5, 5), new Vector3(-20, 0, 5));
         visualDistractions[1] = new VisualDistraction(capsule, new Vector3(-27, 15, 10), new Vector3(2, 2, 2), new Vector3(20, 0, 5));
         visualDistractions[2] = new VisualDistraction(cylinder, new Vector3(0, 15, 20), new Vector3(1, 1, 1), new Vector3(3, 0, -10));
         visualDistractions[3] = new VisualDistraction(square1, new Vector3(0, 15, 10), new Vector3(4, 1, 1), new Vector3(0, 0, 5));
-        visualDistractions[4] = new VisualDistraction(square1, new Vector3(0, 25, 20), new Vector3(1, 4, 4), new Vector3(0, 0, 0));
+        visualDistractions[4] = new VisualDistraction(square2, new Vector3(15, 25, 25), new Vector3(1, 2, 4), Vector3.zero);
+        visualDistractions[5] = new VisualDistraction(ball, new Vector3(40, 0, 40), new Vector3(2, 2, 2), new Vector3(-50, 0, 0));
+        visualDistractions[6] = new VisualDistraction(ball, new Vector3(-40, 0, 40), new Vector3(2, 2, 2), new Vector3(50, 0, 0));
+
 
         for (int i = 0; i < words.Length; i++)
         {
@@ -377,11 +396,14 @@ public class Board : MonoBehaviour
 
         for (int i = 0; i < GetCurrentLesson().words.Length; i++)
         {
+            HeadOutOfRange = false;
             DisplayWordOnBoard(GetCurrentLesson().words[i]);
 
             GetCurrentLesson().words[i].WordDistraction.StartDistraction();
             yield return new WaitForSeconds(secondsToWait);
+            GetCurrentLesson().words[i].HeadOutOfRange = HeadOutOfRange;
             GetCurrentLesson().words[i].WordDistraction.StopDistraction();
+            Debug.Log(GetCurrentLesson().words[i].ForiegnWord + ", Out of range: " + GetCurrentLesson().words[i].HeadOutOfRange);
         }
 
         LessonBoardText.SetText(string.Format("Lesson has ended.\nPress 'Start' to begin the exam."));
@@ -406,7 +428,7 @@ public class Board : MonoBehaviour
         if (currentSessionIndex == sessions - 1)
         {
             ChangeBoardStatus(BoardState.End);
-            DisplayTextOnBoard("Bye.");
+            DisplayTextOnBoard("Press 'Start' results.");
         }
 
         else
@@ -415,6 +437,12 @@ public class Board : MonoBehaviour
             ChangeBoardStatus(BoardState.ExamEnded);
             DisplayTextOnBoard("Exam ended.\nPress 'Start' for a new Lesson.");
         }
+    }
+
+    public void AnalyzeResults()
+    {
+
+
     }
 
     public void HandleUserAnswer(Question q)

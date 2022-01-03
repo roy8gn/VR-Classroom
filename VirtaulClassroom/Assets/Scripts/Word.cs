@@ -8,6 +8,7 @@ public class Word
     public string EnglishTranslation { get; set; }
     public string[] WrongTranslations;
     public Distraction WordDistraction { get; set; }
+    public bool HeadOutOfRange { get; set; } // if true - user got distracted
 
     public Word(string foriegnWord, string englishTranslation, string[] wt)
     {
