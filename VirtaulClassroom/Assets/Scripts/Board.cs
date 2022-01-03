@@ -441,6 +441,42 @@ public class Board : MonoBehaviour
 
     public void AnalyzeResults()
     {
+        Dictionary<DistractionTypeForLesson, double> DistractionDictionary=new Dictionary<DistractionTypeForLesson, double>(); // 
+        for(int i=0;i<sessions;i++)
+        {
+            DistractionDictionary.Add(lessons[i].DistractionType, 0);
+            for (int j = 0; j < wordsPerSession; j++)
+            {
+                if (exams[i].questions[j].IsAnswerCorrect == true && exams[0].questions[j].word.HeadOutOfRange == true)
+                    DistractionDictionary[lessons[i].DistractionType] += 0.25;
+                //if (exams[i].questions[j].IsAnswerCorrect == true && exams[0].questions[j].word.HeadOutOfRange == false)
+                    // do nothing
+                if (exams[i].questions[j].IsAnswerCorrect == false && exams[0].questions[j].word.HeadOutOfRange == true)
+                    DistractionDictionary[lessons[i].DistractionType] += 1;
+                if (exams[i].questions[j].IsAnswerCorrect == false && exams[0].questions[j].word.HeadOutOfRange == false)
+                    DistractionDictionary[lessons[i].DistractionType] += 0.50;
+            }
+            Debug.Log(lessons[i].DistractionType + " " + DistractionDictionary[lessons[i].DistractionType]);
+        }
+        foreach (var item in DistractionDictionary)
+        {
+            if(item.Value <= 5 && item.Value >= 0)
+            {
+
+            }
+
+            if (item.Value <= 7.5 && item.Value > 5)
+            {
+
+            }
+
+            if (item.Value <= 10 && item.Value > 7.5)
+            {
+
+            }
+        }
+        
+
 
 
     }
