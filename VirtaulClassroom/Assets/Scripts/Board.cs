@@ -5,6 +5,7 @@ using UnityEngine;
 using System;
 using Random = System.Random;
 using System.IO;
+using Newtonsoft.Json;
 
 public class Board : MonoBehaviour
 {
@@ -150,7 +151,7 @@ public class Board : MonoBehaviour
                 wordsForSession[j] = ws[i * wordsPerSession + j];
             }
             DistractionTypeForLesson distractionForLesson = dict[i % distractionTypes];
-            FillWordsWithDistractions(wordsForSession, /*distractionForLesson */ DistractionTypeForLesson.Visual);
+            FillWordsWithDistractions(wordsForSession, distractionForLesson);
             ls[i] = new Lesson(wordsForSession, LessonType.Visual, distractionForLesson);
             es[i] = new Exam(wordsForSession, random);
         }
@@ -331,8 +332,8 @@ public class Board : MonoBehaviour
 
         visualDistractions[0] = new VisualDistraction(sphere, new Vector3(27, 15, 10), new Vector3(5, 5, 5), new Vector3(-20, 0, 5));
         visualDistractions[1] = new VisualDistraction(capsule, new Vector3(-27, 15, 10), new Vector3(2, 2, 2), new Vector3(20, 0, 5));
-        visualDistractions[2] = new VisualDistraction(cylinder, new Vector3(0, 15, 20), new Vector3(1, 1, 1), new Vector3(3, 0, -10));
-        visualDistractions[3] = new VisualDistraction(square1, new Vector3(0, 15, 10), new Vector3(4, 1, 1), new Vector3(0, 0, 5));
+        visualDistractions[2] = new VisualDistraction(cylinder, new Vector3(-20, 15, 20), new Vector3(1, 1, 1), new Vector3(20, 0, -10));
+        visualDistractions[3] = new VisualDistraction(square1, new Vector3(20, 15, 10), new Vector3(4, 1, 1), new Vector3(-25, 0, 5));
         visualDistractions[4] = new VisualDistraction(square2, new Vector3(15, 25, 25), new Vector3(1, 2, 4), Vector3.zero);
         visualDistractions[5] = new VisualDistraction(ball, new Vector3(40, 0, 40), new Vector3(2, 2, 2), new Vector3(-50, 0, 0));
         visualDistractions[6] = new VisualDistraction(ball, new Vector3(-40, 0, 40), new Vector3(2, 2, 2), new Vector3(50, 0, 0));
@@ -441,44 +442,108 @@ public class Board : MonoBehaviour
 
     public void AnalyzeResults()
     {
-        Dictionary<DistractionTypeForLesson, double> DistractionDictionary=new Dictionary<DistractionTypeForLesson, double>(); // 
+        string recommendationString;
+        Recommendation userRecommendation = new Recommendation();
+        Dictionary<DistractionTypeForLesson, double> distractionDictionary=new Dictionary<DistractionTypeForLesson, double>(); // 
         for(int i=0;i<sessions;i++)
         {
-            DistractionDictionary.Add(lessons[i].DistractionType, 0);
+            distractionDictionary.Add(lessons[i].DistractionType, 0);
             for (int j = 0; j < wordsPerSession; j++)
             {
                 if (exams[i].questions[j].IsAnswerCorrect == true && exams[0].questions[j].word.HeadOutOfRange == true)
-                    DistractionDictionary[lessons[i].DistractionType] += 0.25;
+                    distractionDictionary[lessons[i].DistractionType] += 0.25;
                 //if (exams[i].questions[j].IsAnswerCorrect == true && exams[0].questions[j].word.HeadOutOfRange == false)
                     // do nothing
                 if (exams[i].questions[j].IsAnswerCorrect == false && exams[0].questions[j].word.HeadOutOfRange == true)
-                    DistractionDictionary[lessons[i].DistractionType] += 1;
+                    distractionDictionary[lessons[i].DistractionType] += 1;
                 if (exams[i].questions[j].IsAnswerCorrect == false && exams[0].questions[j].word.HeadOutOfRange == false)
-                    DistractionDictionary[lessons[i].DistractionType] += 0.50;
+                    distractionDictionary[lessons[i].DistractionType] += 0.50;
             }
-            Debug.Log(lessons[i].DistractionType + " " + DistractionDictionary[lessons[i].DistractionType]);
+            //Debug.Log(lessons[i].DistractionType + " " + DistractionDictionary[lessons[i].DistractionType]);
         }
-        foreach (var item in DistractionDictionary)
+        foreach (var item in distractionDictionary)
         {
             if(item.Value <= 5 && item.Value >= 0)
             {
-
+                if(item.Key == DistractionTypeForLesson.Visual)
+                {
+                    recommendationString = "Visual distractions and stimulations are not particularly bothersome for you.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }
+                if(item.Key == DistractionTypeForLesson.Auditory)
+                {
+                    recommendationString = "Auditory distractions and stimulations are not particularly bothersome for you.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }
+                /*if(item.Key == DistractionTypeForLesson.None)
+                {
+                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
+                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }*/
             }
 
             if (item.Value <= 7.5 && item.Value > 5)
             {
-
+                if (item.Key == DistractionTypeForLesson.Visual)
+                {
+                    recommendationString = "Visual distractions and stimulations are somewhat bothersome for you. It is recommended that you keep your learning environment " +
+                        "tidy.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }
+                if (item.Key == DistractionTypeForLesson.Auditory)
+                {
+                    recommendationString = "Auditory distractions and stimulations are somewhat bothersome for you. It is recommended that you avoid extreme noise in your learning" +
+                        "environment.";
+                     
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }
+                /*if (item.Key == DistractionTypeForLesson.None)
+                {
+                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
+                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }*/
             }
 
             if (item.Value <= 10 && item.Value > 7.5)
             {
-
+                if (item.Key == DistractionTypeForLesson.Visual)
+                {
+                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
+                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }
+                if (item.Key == DistractionTypeForLesson.Auditory)
+                {
+                    recommendationString = "Auditory distractions and stimulations are somewhat bothersome for you. It is recommended that you keep your learning environment " +
+                        "silent. Close all doors and windows, turn off noisy electronic devices and ask people in the room to keep their voices down.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }
+                /*if (item.Key == DistractionTypeForLesson.None)
+                {
+                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
+                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
+                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                }*/
             }
         }
-        
+        //string json = JsonConvert.SerializeObject(userRecommendation);
+        File.WriteAllText(@"e:\report.json", JsonConvert.SerializeObject(userRecommendation));
+        DisplayReportOnBoard(string.Format("Final Recommendations: \n" + userRecommendation.RecommendationDictionary[DistractionTypeForLesson.Visual] + "\n" +
+           userRecommendation.RecommendationDictionary[DistractionTypeForLesson.Auditory]));
+      
+    }
 
-
-
+    public void DisplayReportOnBoard(string s)
+    {
+        LessonBoardText.fontSize = 12;
+        LessonBoardText.SetText(string.Format($"{s}"));
+        ExamQuestionBoardText.SetText("");
+        OptionAText.SetText(string.Empty);
+        OptionBText.SetText(string.Empty);
+        OptionCText.SetText(string.Empty);
+        OptionDText.SetText(string.Empty);
     }
 
     public void HandleUserAnswer(Question q)
