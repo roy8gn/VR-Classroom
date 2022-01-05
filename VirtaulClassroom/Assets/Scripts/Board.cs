@@ -177,37 +177,35 @@ public class Board : MonoBehaviour
     public List<Word> LoadForeignWordsFromCsvFile()
     {
         List<Word> words = new List<Word>();
-        using (var reader = new StreamReader("./Assets/WordsDataSets/ForeignWords.csv"))
+        TextAsset file = Resources.Load("ForeignWords") as TextAsset;
+        string content = file.ToString();
+        var lines = content.Split('\n');
+        foreach (string line in lines)
         {
-            while (!reader.EndOfStream)
+            try
             {
-                var line = reader.ReadLine();
                 var values = line.Split(',');
-                try
-                {
-                    words.Add(new Word(values[0], values[1]));
-                }
-                catch (ArgumentException) { }
+                words.Add(new Word(values[0], values[1]));
             }
+            catch (Exception) { break; }
         }
+
         return words;
     }
 
     public List<string> LoadEnglishWordsFromCsvFile()
     {
         List<string> words = new List<string>();
-        using (var reader = new StreamReader("./Assets/WordsDataSets/EnglishWords.csv"))
+        TextAsset file = Resources.Load("EnglishWords") as TextAsset;
+        string content = file.ToString();
+        var lines = content.Split('\n');
+        foreach (string line in lines)
         {
-            while (!reader.EndOfStream)
+            try
             {
-                var line = reader.ReadLine();
-                var values = line.Split();
-                try
-                {
-                    words.Add(values[0]);
-                }
-                catch (ArgumentException) { }
+                words.Add(line);
             }
+            catch (Exception) { break; }
         }
 
         return words;
