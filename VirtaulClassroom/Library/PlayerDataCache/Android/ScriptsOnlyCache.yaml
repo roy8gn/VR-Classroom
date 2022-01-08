@@ -2,7 +2,12 @@ ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
     - Board
+    - BtnAScript
+    - BtnBScript
+    - BtnCScript
+    - BtnDScript
     - Clock
+    - StartScript
     - VrClassButton
     Unity.InputSystem.dll:
     - UnityEngine.InputSystem.InputActionAsset
@@ -20,17 +25,24 @@ ScriptsOnlyBuild:
     - TMPro.TMP_StyleSheet
     - TMPro.TextMeshPro
     - TMPro.TextMeshProUGUI
+    Unity.XR.CoreUtils.dll:
+    - Unity.XR.CoreUtils.XROrigin
+    Unity.XR.Interaction.Toolkit.Editor.dll:
+    - UnityEditor.XR.Interaction.Toolkit.XRInteractionEditorSettings
     Unity.XR.Interaction.Toolkit.dll:
     - UnityEngine.XR.Interaction.Toolkit.ActionBasedContinuousMoveProvider
     - UnityEngine.XR.Interaction.Toolkit.ActionBasedController
-    - UnityEngine.XR.Interaction.Toolkit.ActionBasedSnapTurnProvider
+    - UnityEngine.XR.Interaction.Toolkit.CharacterControllerDriver
     - UnityEngine.XR.Interaction.Toolkit.Inputs.InputActionManager
+    - UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation.XRDeviceSimulator
+    - UnityEngine.XR.Interaction.Toolkit.InteractionLayerSettings
     - UnityEngine.XR.Interaction.Toolkit.LocomotionSystem
+    - UnityEngine.XR.Interaction.Toolkit.TeleportationProvider
+    - UnityEngine.XR.Interaction.Toolkit.UI.TrackedDeviceGraphicRaycaster
+    - UnityEngine.XR.Interaction.Toolkit.UI.XRUIInputModule
     - UnityEngine.XR.Interaction.Toolkit.XRGrabInteractable
-    - UnityEngine.XR.Interaction.Toolkit.XRInteractionManager
     - UnityEngine.XR.Interaction.Toolkit.XRInteractorLineVisual
     - UnityEngine.XR.Interaction.Toolkit.XRRayInteractor
-    - UnityEngine.XR.Interaction.Toolkit.XRRig
     Unity.XR.Management.Editor.dll:
     - UnityEditor.XR.Management.XRGeneralSettingsPerBuildTarget
     Unity.XR.Management.dll:
@@ -63,11 +75,6 @@ ScriptsOnlyBuild:
     - UnityEngine.XR.OpenXR.Features.Interactions.ValveIndexControllerProfile
     - UnityEngine.XR.OpenXR.OpenXRLoader
     - UnityEngine.XR.OpenXR.OpenXRSettings
-    Unity.XR.WindowsMixedReality.Editor.dll:
-    - UnityEditor.XR.WindowsMR.WindowsMRPackageSettings
-    Unity.XR.WindowsMixedReality.dll:
-    - UnityEngine.XR.WindowsMR.WindowsMRBuildSettings
-    - UnityEngine.XR.WindowsMR.WindowsMRSettings
     UnityEditor.TestRunner.dll:
     - UnityEditor.TestTools.TestRunner.Api.CallbacksHolder
     - UnityEditor.TestTools.TestRunner.TestListCacheData
@@ -75,8 +82,12 @@ ScriptsOnlyBuild:
     UnityEngine.SpatialTracking.dll:
     - UnityEngine.SpatialTracking.TrackedPoseDriver
     UnityEngine.UI.dll:
+    - UnityEngine.EventSystems.EventSystem
+    - UnityEngine.UI.Button
     - UnityEngine.UI.CanvasScaler
     - UnityEngine.UI.GraphicRaycaster
+    - UnityEngine.UI.Image
+    - UnityEngine.UI.Text
   sceneClasses:
     Assets/Scenes/SampleScene.unity:
     - Class: 1
@@ -124,59 +135,85 @@ ScriptsOnlyBuild:
     - Class: 108
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 468}
+      Script: {instanceID: 466}
     - Class: 114
-      Script: {instanceID: 472}
-    - Class: 114
-      Script: {instanceID: 476}
+      Script: {instanceID: 474}
     - Class: 114
       Script: {instanceID: 1620}
     - Class: 114
-      Script: {instanceID: 1746}
+      Script: {instanceID: 1696}
     - Class: 114
-      Script: {instanceID: 2048}
+      Script: {instanceID: 1754}
     - Class: 114
-      Script: {instanceID: 2070}
+      Script: {instanceID: 2082}
     - Class: 114
-      Script: {instanceID: 2458}
+      Script: {instanceID: 2108}
     - Class: 114
-      Script: {instanceID: 2780}
+      Script: {instanceID: 2320}
     - Class: 114
-      Script: {instanceID: 2876}
+      Script: {instanceID: 2558}
     - Class: 114
-      Script: {instanceID: 2906}
+      Script: {instanceID: 2562}
     - Class: 114
-      Script: {instanceID: 2934}
+      Script: {instanceID: 2696}
     - Class: 114
-      Script: {instanceID: 3156}
+      Script: {instanceID: 2888}
     - Class: 114
-      Script: {instanceID: 3354}
+      Script: {instanceID: 2994}
     - Class: 114
-      Script: {instanceID: 3502}
+      Script: {instanceID: 3060}
     - Class: 114
-      Script: {instanceID: 3538}
+      Script: {instanceID: 3230}
     - Class: 114
-      Script: {instanceID: 4108}
+      Script: {instanceID: 3292}
     - Class: 114
-      Script: {instanceID: 4158}
+      Script: {instanceID: 3420}
     - Class: 114
-      Script: {instanceID: 4298}
+      Script: {instanceID: 3506}
     - Class: 114
-      Script: {instanceID: 4416}
+      Script: {instanceID: 3588}
     - Class: 114
-      Script: {instanceID: 4684}
+      Script: {instanceID: 3674}
     - Class: 114
-      Script: {instanceID: 4716}
+      Script: {instanceID: 3712}
     - Class: 114
-      Script: {instanceID: 4920}
+      Script: {instanceID: 3970}
     - Class: 114
-      Script: {instanceID: 5328}
+      Script: {instanceID: 4140}
     - Class: 114
-      Script: {instanceID: 5354}
+      Script: {instanceID: 4334}
     - Class: 114
-      Script: {instanceID: 5538}
+      Script: {instanceID: 4386}
     - Class: 114
-      Script: {instanceID: 5716}
+      Script: {instanceID: 4532}
+    - Class: 114
+      Script: {instanceID: 4658}
+    - Class: 114
+      Script: {instanceID: 4940}
+    - Class: 114
+      Script: {instanceID: 4972}
+    - Class: 114
+      Script: {instanceID: 4974}
+    - Class: 114
+      Script: {instanceID: 5070}
+    - Class: 114
+      Script: {instanceID: 5118}
+    - Class: 114
+      Script: {instanceID: 5614}
+    - Class: 114
+      Script: {instanceID: 5642}
+    - Class: 114
+      Script: {instanceID: 5842}
+    - Class: 114
+      Script: {instanceID: 5984}
+    - Class: 114
+      Script: {instanceID: 6028}
+    - Class: 114
+      Script: {instanceID: 6194}
+    - Class: 114
+      Script: {instanceID: 6420}
+    - Class: 114
+      Script: {instanceID: 6602}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 120
@@ -189,9 +226,13 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 138
       Script: {instanceID: 0}
+    - Class: 143
+      Script: {instanceID: 0}
     - Class: 157
       Script: {instanceID: 0}
     - Class: 196
+      Script: {instanceID: 0}
+    - Class: 213
       Script: {instanceID: 0}
     - Class: 222
       Script: {instanceID: 0}
@@ -202,25 +243,25 @@ ScriptsOnlyBuild:
   scriptHashData:
   - hash:
       serializedVersion: 2
-      Hash: 409afa968cfe9411d1db9305ba39ee5a
+      Hash: 219b6caaad9662ed6a7d81ee3a9cd53d
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: ActionBasedContinuousTurnProvider
   - hash:
       serializedVersion: 2
-      Hash: 5d820a4b2d2a41b143640b8af1508079
+      Hash: a6c29e92dd6fcd5262c7189a67722496
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: ActionBasedContinuousMoveProvider
   - hash:
       serializedVersion: 2
-      Hash: a79f55b94530e531932993ef684dcd5e
+      Hash: dda32ffa9d59b8eb1822fc59bdec67fa
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: ActionBasedSnapTurnProvider
   - hash:
       serializedVersion: 2
-      Hash: 21b46d9f010712a2a3c529bf3fb90da1
+      Hash: 7a3d922f2b08a004ad6764d7bb4be292
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: ActionBasedController
@@ -334,6 +375,12 @@ ScriptsOnlyBuild:
     className: HIDDescriptorWindow
   - hash:
       serializedVersion: 2
+      Hash: 29cb5ccadda8ab62d8dba6d24d61faa4
+    assemblyName: Unity.InputSystem.dll
+    namespaceName: UnityEngine.InputSystem.UI
+    className: VirtualMouseInput
+  - hash:
+      serializedVersion: 2
       Hash: caa533b001ae39b864ba8425019e2268
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
@@ -352,10 +399,16 @@ ScriptsOnlyBuild:
     className: XRInteractorLineVisual
   - hash:
       serializedVersion: 2
-      Hash: 04156ad4f539d9ee82c2ea6a11b2e994
+      Hash: cbcba329b6375fc80724cdb84c225697
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: TeleportationArea
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: BtnDScript
   - hash:
       serializedVersion: 2
       Hash: 1be5ee23282525b841976a22826bcd2b
@@ -370,16 +423,16 @@ ScriptsOnlyBuild:
     className: GroupTrack
   - hash:
       serializedVersion: 2
-      Hash: 800c50acba124432abb4cf0d47202e06
-    assemblyName: Unity.TextMeshPro.dll
-    namespaceName: TMPro
-    className: TMP_StyleSheet
-  - hash:
-      serializedVersion: 2
       Hash: ea41fa959037983f32ebd7c70de46554
     assemblyName: Unity.XR.OpenXR.Features.MockDriver.dll
     namespaceName: UnityEngine.XR.OpenXR.Features.Mock
     className: MockDriver
+  - hash:
+      serializedVersion: 2
+      Hash: 800c50acba124432abb4cf0d47202e06
+    assemblyName: Unity.TextMeshPro.dll
+    namespaceName: TMPro
+    className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
       Hash: 699619b86d9359741a4f58540298c80b
@@ -400,10 +453,16 @@ ScriptsOnlyBuild:
     className: PlaymodeTestsController
   - hash:
       serializedVersion: 2
-      Hash: cff01b5b88cc766877d6063f06474ac2
+      Hash: 0ba4f852acbdf2f4c8742687e6bd7efb
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: TeleportationAnchor
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: BtnAScript
   - hash:
       serializedVersion: 2
       Hash: e2549d3a59249ea600e260df1932d6f7
@@ -448,7 +507,7 @@ ScriptsOnlyBuild:
     className: XRTintInteractableVisual
   - hash:
       serializedVersion: 2
-      Hash: 6acf3484c87fc8fea2eb8bdddc84592d
+      Hash: 5b2330da860cd1fc7110dfd2c3c1535f
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRRig
@@ -538,7 +597,7 @@ ScriptsOnlyBuild:
     className: OpenXRLoader
   - hash:
       serializedVersion: 2
-      Hash: 36998e93d8022e1504427f8fbadd13c1
+      Hash: b60567947372804f8a7d4252d26bcc89
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRSocketInteractor
@@ -554,6 +613,18 @@ ScriptsOnlyBuild:
     assemblyName: Unity.XR.OpenXR.dll
     namespaceName: UnityEngine.XR.OpenXR.Features.Interactions
     className: MicrosoftHandInteraction
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Unity.XR.CoreUtils.dll
+    namespaceName: Unity.XR.CoreUtils
+    className: OnDestroyNotifier
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: BtnCScript
   - hash:
       serializedVersion: 2
       Hash: a306e12d896ddcca949923c805691027
@@ -580,7 +651,7 @@ ScriptsOnlyBuild:
     className: VrClassButton
   - hash:
       serializedVersion: 2
-      Hash: 0852a9ae89c8006a631334a0496cab0e
+      Hash: 0247b3226bce1611f95bef667f3a55b3
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRRayInteractor
@@ -622,16 +693,16 @@ ScriptsOnlyBuild:
     className: BeforeAfterTestCommandState
   - hash:
       serializedVersion: 2
-      Hash: 0fd6822f6177297bd0eb4d83cc7a9030
-    assemblyName: UnityEngine.UI.dll
-    namespaceName: UnityEngine.UI
-    className: ToggleGroup
-  - hash:
-      serializedVersion: 2
       Hash: 69415240821be7986b27e72bf9609a30
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
     className: Button
+  - hash:
+      serializedVersion: 2
+      Hash: 0fd6822f6177297bd0eb4d83cc7a9030
+    assemblyName: UnityEngine.UI.dll
+    namespaceName: UnityEngine.UI
+    className: ToggleGroup
   - hash:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
@@ -656,6 +727,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
     className: TextContainer
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: BtnBScript
   - hash:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
@@ -706,7 +783,7 @@ ScriptsOnlyBuild:
     className: OpenXRRestarter
   - hash:
       serializedVersion: 2
-      Hash: 52c374fd16683004aee69a7299d5e7f2
+      Hash: 0d770518ee644c1c6fec498f698fe9a8
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Board
@@ -748,7 +825,7 @@ ScriptsOnlyBuild:
     className: OculusLoader
   - hash:
       serializedVersion: 2
-      Hash: 5bc5466e198a4045dc8caf1ca0c6dcb4
+      Hash: 5aea7b360f47fa710e993f05cfdace3e
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRControllerRecording
@@ -760,7 +837,7 @@ ScriptsOnlyBuild:
     className: BaseInput
   - hash:
       serializedVersion: 2
-      Hash: b418ddfcdc343d22d2860cbd40346cb7
+      Hash: 2a3ee2b042aca4b4e717251910bb3696
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRGrabInteractable
@@ -802,7 +879,7 @@ ScriptsOnlyBuild:
     className: PositionAsUV1
   - hash:
       serializedVersion: 2
-      Hash: fa7c15d4e264fb35c75c98dd2fbb20ce
+      Hash: a7831da141552e39fb47ba8a0cb14d0d
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRDirectInteractor
@@ -820,7 +897,7 @@ ScriptsOnlyBuild:
     className: AudioPlayableAsset
   - hash:
       serializedVersion: 2
-      Hash: 03f6211005e1acef2a2efb63207643a1
+      Hash: 2d22adb9be23ab6264808f74bae28251
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: XRSimpleInteractable
@@ -850,7 +927,7 @@ ScriptsOnlyBuild:
     className: DeviceBasedSnapTurnProvider
   - hash:
       serializedVersion: 2
-      Hash: 6be939d6f0aad748aa63a8815400aaa2
+      Hash: da582d98ca3927dc62f0e96e967a4a74
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem
     className: InputSettings
@@ -868,7 +945,13 @@ ScriptsOnlyBuild:
     className: MockHMDBuildSettings
   - hash:
       serializedVersion: 2
-      Hash: 295852e83016219fe0ab9a38fc36f74a
+      Hash: c24b0c4ed62d8b7eabb5a4c9a20f4e00
+    assemblyName: Unity.XR.Interaction.Toolkit.dll
+    namespaceName: UnityEngine.XR.Interaction.Toolkit
+    className: InteractionLayerSettings
+  - hash:
+      serializedVersion: 2
+      Hash: d79be48f820686024dd0d9e080d7733b
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem
     className: InputActionAsset
@@ -890,6 +973,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: ActivationTrack
+  - hash:
+      serializedVersion: 2
+      Hash: 4efe5f564d36c37295fd0e7407c4ad9a
+    assemblyName: Unity.XR.CoreUtils.dll
+    namespaceName: Unity.XR.CoreUtils
+    className: XROrigin
   - hash:
       serializedVersion: 2
       Hash: c3d3430df9e3ea95e3e3d587961390fb
@@ -952,7 +1041,7 @@ ScriptsOnlyBuild:
     className: TrackedDeviceRaycaster
   - hash:
       serializedVersion: 2
-      Hash: f17a7afbb6fc4d6b5c3ba20ed1c93f68
+      Hash: 75d82cdc8c4eb5f12570aa378266875e
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem.UI
     className: InputSystemUIInputModule
@@ -1006,7 +1095,7 @@ ScriptsOnlyBuild:
     className: TMP_Settings
   - hash:
       serializedVersion: 2
-      Hash: 3943f92ff673186617cda33896d415e6
+      Hash: d8c9c53ba0b1477ec5a91355304f709c
     assemblyName: Unity.XR.Interaction.Toolkit.dll
     namespaceName: UnityEngine.XR.Interaction.Toolkit
     className: LocomotionSystem
@@ -1030,7 +1119,7 @@ ScriptsOnlyBuild:
     className: MultiplayerEventSystem
   - hash:
       serializedVersion: 2
-      Hash: a8afcbd0a467dd957879959591dec288
+      Hash: 72763ba72b43403ee09a4c54b07cb346
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem.XR
     className: TrackedPoseDriver
@@ -1090,7 +1179,7 @@ ScriptsOnlyBuild:
     className: InputDeviceDebuggerWindow
   - hash:
       serializedVersion: 2
-      Hash: 880d064aa7bf32abd8295b0fe07bcc13
+      Hash: c5fd7bfc1806f78178f8b5f91e072387
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem
     className: InputSystemObject
@@ -1114,6 +1203,12 @@ ScriptsOnlyBuild:
     className: OculusQuestFeature
   - hash:
       serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: StartScript
+  - hash:
+      serializedVersion: 2
       Hash: ea41fa959037983f32ebd7c70de46554
     assemblyName: Unity.XR.OpenXR.dll
     namespaceName: UnityEngine.XR.OpenXR.Features.Interactions
@@ -1126,7 +1221,7 @@ ScriptsOnlyBuild:
     className: SignalEmitter
   - hash:
       serializedVersion: 2
-      Hash: 21a597af000da536a7adc9efe10b8d5d
+      Hash: 766d1e816bcaf02d44dc1df06af2bf9a
     assemblyName: Unity.InputSystem.dll
     namespaceName: UnityEngine.InputSystem
     className: PlayerInputManager

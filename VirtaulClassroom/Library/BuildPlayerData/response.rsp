@@ -18,6 +18,7 @@
 -a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PlayerScriptAssemblies\Unity.XR.ARSubsystems.dll"
 -a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PlayerScriptAssemblies\Unity.XR.OpenXR.dll"
 -a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PlayerScriptAssemblies\Unity.XR.OpenXR.Features.ConformanceAutomation.dll"
+-a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PlayerScriptAssemblies\Unity.XR.CoreUtils.dll"
 -a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PlayerScriptAssemblies\Unity.XR.OpenXR.Features.MockDriver.dll"
 -a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PlayerScriptAssemblies\Unity.XR.Oculus.dll"
 -a="C:\Users\Bar\Documents\GitHub\VR-Classroom\VirtaulClassroom\Library\PackageCache\com.unity.nuget.newtonsoft-json@2.0.0\Runtime\AOT\Newtonsoft.Json.dll"

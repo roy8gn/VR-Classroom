@@ -6,9 +6,11 @@ using System;
 using Random = System.Random;
 using System.IO;
 using Newtonsoft.Json;
+using System.Linq;
 
 public class Board : MonoBehaviour
 {
+    // Text meshes
     public TextMeshPro LessonBoardText;
     public TextMeshPro ExamQuestionBoardText;
     public TextMeshPro OptionAText;
@@ -16,12 +18,7 @@ public class Board : MonoBehaviour
     public TextMeshPro OptionCText;
     public TextMeshPro OptionDText;
 
-    [SerializeField] private VrClassButton startButton;
-    [SerializeField] private VrClassButton optionAButton;
-    [SerializeField] private VrClassButton optionBButton;
-    [SerializeField] private VrClassButton optionCButton;
-    [SerializeField] private VrClassButton optionDButton;
-
+    // Audio Sources in the scene - additional ones need to be added here
     public AudioSource DogBark;
     public AudioSource PhoneNoise;
     public AudioSource Bus;
@@ -36,12 +33,14 @@ public class Board : MonoBehaviour
     public Transform HeadTracker;
     public bool HeadOutOfRange = false;
 
+    // Application properties
     private BoardState boardState = BoardState.Start;
     private int sessions = 3;
     private int wordsPerSession = 10;
     private int currentSessionIndex = 0;
     private int distractionTypes = 3; // Visual, Auditory, None
     private int wrongTranslationsPerQuestion = 3;
+    private int secondsToWait = 2;
     private Lesson[] lessons;
     private Exam[] exams;
     private Random random;
@@ -51,17 +50,9 @@ public class Board : MonoBehaviour
     private ChoiceOption UserAnswerChoiceIndex { get; set; }
     private bool WaitForUserToAnswer { get; set; }
 
-    private int secondsToWait = 3;
-
     // Start is called before the first frame update
     void Start()
     {
-        startButton?.onPressed.AddListener(OnStartButtonPressed);
-        optionAButton?.onPressed.AddListener(OnOptionAButtonPressed);
-        optionBButton?.onPressed.AddListener(OnOptionBButtonPressed);
-        optionCButton?.onPressed.AddListener(OnOptionCButtonPressed);
-        optionDButton?.onPressed.AddListener(OnOptionDButtonPressed);
-
         LessonBoardText = GetComponentInChildren<TextMeshPro>();
         LessonBoardText.SetText("Welcome!\nPress 'Start' to begin.");
     }
@@ -69,33 +60,21 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         try
         {
-            if (HeadTracker.rotation.y > -0.35 && HeadTracker.rotation.y < 0.35 && HeadTracker.rotation.x > -0.2 && HeadTracker.rotation.x < 0.2)
-            {
-                //Debug.Log("In Range");
-            }
-            else
+            if (!(HeadTracker.rotation.y > -0.35 && HeadTracker.rotation.y < 0.35 && HeadTracker.rotation.x > -0.2 && HeadTracker.rotation.x < 0.2)) // Check every frame if user loses attention of board
             {
                 HeadOutOfRange = true;
-                //Debug.Log("Out Of Range");
             }
         }
         catch(Exception) { }
-        
     }
 
     public void OnDestroy()
     {
-        startButton?.onPressed.RemoveListener(OnStartButtonPressed);
-        optionAButton?.onPressed.RemoveListener(OnOptionAButtonPressed);
-        optionBButton?.onPressed.RemoveListener(OnOptionBButtonPressed);
-        optionCButton?.onPressed.RemoveListener(OnOptionCButtonPressed);
-        optionDButton?.onPressed.RemoveListener(OnOptionDButtonPressed);
     }
 
-    void OnStartButtonPressed()
+    public void OnStartButtonPressed()
     {
         switch (boardState)
         {
@@ -127,8 +106,8 @@ public class Board : MonoBehaviour
 
     public void LoadWordsFromDataSets()
     {
-        List<Word> wordsDataSet = LoadForeignWordsFromCsvFile();
-        List<string> englishWordsDataSet = LoadEnglishWordsFromCsvFile();
+        List<Word> wordsDataSet = LoadForeignWordsFromCsvFile(); // Load foreign words and their translations
+        List<string> englishWordsDataSet = LoadEnglishWordsFromCsvFile(); // Load random incorrect translations
 
         int totalnumberOfWords = sessions * wordsPerSession;
         Word[] chosenWords = ChooseWordsRandomly(wordsDataSet, totalnumberOfWords);
@@ -177,7 +156,7 @@ public class Board : MonoBehaviour
     public List<Word> LoadForeignWordsFromCsvFile()
     {
         List<Word> words = new List<Word>();
-        TextAsset file = Resources.Load("ForeignWords") as TextAsset;
+        TextAsset file = Resources.Load("ForeignWords") as TextAsset; // Note - when loading from Resources folder, no specifying extension
         string content = file.ToString();
         var lines = content.Split('\n');
         foreach (string line in lines)
@@ -196,7 +175,7 @@ public class Board : MonoBehaviour
     public List<string> LoadEnglishWordsFromCsvFile()
     {
         List<string> words = new List<string>();
-        TextAsset file = Resources.Load("EnglishWords") as TextAsset;
+        TextAsset file = Resources.Load("EnglishWords") as TextAsset; // Note - when loading from Resources folder, no specifying extension
         string content = file.ToString();
         var lines = content.Split('\n');
         foreach (string line in lines)
@@ -250,7 +229,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void FillWordsWithDistractions(Word[] words, DistractionTypeForLesson dt)
+    public void FillWordsWithDistractions(Word[] words, DistractionTypeForLesson dt) // Assign distractions to Word objects
     {
         switch (dt)
         {
@@ -292,6 +271,7 @@ public class Board : MonoBehaviour
         audioDistractions[7] = new AudioDistraction(Tractor);
         audioDistractions[8] = new AudioDistraction(Hammering);
         audioDistractions[9] = new AudioDistraction(PhoneTyping);
+        // Add new AudioSources here for more distractions
 
         for (int i = 0; i < words.Length; i++)
         {
@@ -304,6 +284,7 @@ public class Board : MonoBehaviour
     {
         visualDistractions = new VisualDistraction[7];
         
+        // Creating primitive objects to use as visual distractions
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.AddComponent<Rigidbody>();
         sphere.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
@@ -328,14 +309,14 @@ public class Board : MonoBehaviour
         ball.AddComponent<Rigidbody>();
         ball.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
 
+        // Three vector parameters represent starting position in world, size of the object , and direction of force applied to them
         visualDistractions[0] = new VisualDistraction(sphere, new Vector3(27, 15, 10), new Vector3(5, 5, 5), new Vector3(-20, 0, 5));
         visualDistractions[1] = new VisualDistraction(capsule, new Vector3(-27, 15, 10), new Vector3(2, 2, 2), new Vector3(20, 0, 5));
         visualDistractions[2] = new VisualDistraction(cylinder, new Vector3(-20, 15, 20), new Vector3(1, 1, 1), new Vector3(20, 0, -10));
         visualDistractions[3] = new VisualDistraction(square1, new Vector3(20, 15, 10), new Vector3(4, 1, 1), new Vector3(-25, 0, 5));
-        visualDistractions[4] = new VisualDistraction(square2, new Vector3(15, 25, 25), new Vector3(1, 2, 4), Vector3.zero);
-        visualDistractions[5] = new VisualDistraction(ball, new Vector3(40, 0, 40), new Vector3(2, 2, 2), new Vector3(-50, 0, 0));
-        visualDistractions[6] = new VisualDistraction(ball, new Vector3(-40, 0, 40), new Vector3(2, 2, 2), new Vector3(50, 0, 0));
-
+        visualDistractions[4] = new VisualDistraction(square2, new Vector3(25, 2, 25), new Vector3(1, 2, 4), new Vector3(-30, 0, 0));
+        visualDistractions[5] = new VisualDistraction(ball, new Vector3(40, 1, 40), new Vector3(2, 2, 2), new Vector3(-50, 0, 0));
+        visualDistractions[6] = new VisualDistraction(ball, new Vector3(-40, 1, 40), new Vector3(2, 2, 2), new Vector3(50, 0, 0));
 
         for (int i = 0; i < words.Length; i++)
         {
@@ -402,7 +383,7 @@ public class Board : MonoBehaviour
             yield return new WaitForSeconds(secondsToWait);
             GetCurrentLesson().words[i].HeadOutOfRange = HeadOutOfRange;
             GetCurrentLesson().words[i].WordDistraction.StopDistraction();
-            Debug.Log(GetCurrentLesson().words[i].ForiegnWord + ", Out of range: " + GetCurrentLesson().words[i].HeadOutOfRange);
+            //Debug.Log(GetCurrentLesson().words[i].ForiegnWord + ", Out of range: " + GetCurrentLesson().words[i].HeadOutOfRange);
         }
 
         LessonBoardText.SetText(string.Format("Lesson has ended.\nPress 'Start' to begin the exam."));
@@ -440,97 +421,113 @@ public class Board : MonoBehaviour
 
     public void AnalyzeResults()
     {
-        string recommendationString;
+        string recommendationString; // String to be displayed in JSON report
+        string[] boardString = new string[sessions]; // Strings to be displayed on board
+        string finalBoardString; // Final string to display on board
         Recommendation userRecommendation = new Recommendation();
-        Dictionary<DistractionTypeForLesson, double> distractionDictionary=new Dictionary<DistractionTypeForLesson, double>(); // 
         for(int i=0;i<sessions;i++)
         {
-            distractionDictionary.Add(lessons[i].DistractionType, 0);
-            for (int j = 0; j < wordsPerSession; j++)
+            int HeadOutOfRangeCountInALesson = lessons[i].words.Where(x => x.HeadOutOfRange == true).Count(); // Count number of times user moved head away from the board
+   
+            if (exams[i].Score < 55 && HeadOutOfRangeCountInALesson >= wordsPerSession / 2) // First scenario - user distracted by type of distraction, failed exam
             {
-                if (exams[i].questions[j].IsAnswerCorrect == true && exams[0].questions[j].word.HeadOutOfRange == true)
-                    distractionDictionary[lessons[i].DistractionType] += 0.25;
-                //if (exams[i].questions[j].IsAnswerCorrect == true && exams[0].questions[j].word.HeadOutOfRange == false)
-                    // do nothing
-                if (exams[i].questions[j].IsAnswerCorrect == false && exams[0].questions[j].word.HeadOutOfRange == true)
-                    distractionDictionary[lessons[i].DistractionType] += 1;
-                if (exams[i].questions[j].IsAnswerCorrect == false && exams[0].questions[j].word.HeadOutOfRange == false)
-                    distractionDictionary[lessons[i].DistractionType] += 0.50;
-            }
-            //Debug.Log(lessons[i].DistractionType + " " + DistractionDictionary[lessons[i].DistractionType]);
-        }
-        foreach (var item in distractionDictionary)
-        {
-            if(item.Value <= 5 && item.Value >= 0)
-            {
-                if(item.Key == DistractionTypeForLesson.Visual)
+                switch (lessons[i].DistractionType)
                 {
-                    recommendationString = "Visual distractions and stimulations are not particularly bothersome for you.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                    case DistractionTypeForLesson.Visual:
+                        boardString[i]= "Visual distractions and stimulations are particularly bothersome for you.";
+                        recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
+                            " tidy, clean and remove various objects from the periphery of your vision while studying.";
+                        userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.Visual, recommendationString);
+                        userRecommendation.ExamScores.Add(DistractionTypeForLesson.Visual, exams[i].Score);
+                        break;
+
+                    case DistractionTypeForLesson.Auditory:
+                        boardString[i] = "Auditory distractions and stimulations are particularly bothersome for you.";
+                        recommendationString = "Auditory distractions and stimulations are somewhat bothersome for you. It is recommended that you keep your learning environment " +
+                            "silent. Close all doors and windows, turn off noisy electronic devices and ask people in the room to keep their voices down.";
+                        userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.Auditory, recommendationString);
+                        userRecommendation.ExamScores.Add(DistractionTypeForLesson.Auditory, exams[i].Score);
+                        break;
+
+                    case DistractionTypeForLesson.None:
+                        boardString[i] = "You are easily distracted even when no auditory or visual distractions are present.";
+                        recommendationString = "You are easily distracted even when no auditory or visual distractions are present.";
+                        userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.None, recommendationString);
+                        userRecommendation.ExamScores.Add(DistractionTypeForLesson.None, exams[i].Score);
+                        break;
+
+                    default: 
+                        break;
                 }
-                if(item.Key == DistractionTypeForLesson.Auditory)
-                {
-                    recommendationString = "Auditory distractions and stimulations are not particularly bothersome for you.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
-                }
-                /*if(item.Key == DistractionTypeForLesson.None)
-                {
-                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
-                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
-                }*/
             }
 
-            if (item.Value <= 7.5 && item.Value > 5)
+            else
             {
-                if (item.Key == DistractionTypeForLesson.Visual)
+                if (exams[i].Score >= 55 && HeadOutOfRangeCountInALesson >= wordsPerSession / 2) // Second scenario - user distracted, passed exam
                 {
-                    recommendationString = "Visual distractions and stimulations are somewhat bothersome for you. It is recommended that you keep your learning environment " +
-                        "tidy.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
-                }
-                if (item.Key == DistractionTypeForLesson.Auditory)
-                {
-                    recommendationString = "Auditory distractions and stimulations are somewhat bothersome for you. It is recommended that you avoid extreme noise in your learning" +
-                        "environment.";
-                     
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
-                }
-                /*if (item.Key == DistractionTypeForLesson.None)
-                {
-                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
-                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
-                }*/
-            }
+                    switch (lessons[i].DistractionType)
+                    {
+                        case DistractionTypeForLesson.Visual:
+                            boardString[i] = "Visual distractions and stimulations are somewhat bothersome for you.";
+                            recommendationString = "Visual distractions and stimulations are somewhat bothersome for you. It is recommended that you keep your learning environment " +
+                            "tidy.";
+                            userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.Visual, recommendationString);
+                            userRecommendation.ExamScores.Add(DistractionTypeForLesson.Visual, exams[i].Score);
+                            break;
 
-            if (item.Value <= 10 && item.Value > 7.5)
-            {
-                if (item.Key == DistractionTypeForLesson.Visual)
-                {
-                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
-                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                        case DistractionTypeForLesson.Auditory:
+                            boardString[i] = "Auditory distractions and stimulations are somewhat bothersome for you.";
+                            recommendationString = "Auditory distractions and stimulations are somewhat bothersome for you. It is recommended that you avoid extreme noise in your learning" +
+                            " environment.";
+                            userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.Auditory, recommendationString);
+                            userRecommendation.ExamScores.Add(DistractionTypeForLesson.Auditory, exams[i].Score);
+                            break;
+
+                        case DistractionTypeForLesson.None:
+                            boardString[i] = "You are easily distracted even when no auditory or visual distractions are present.";
+                            recommendationString = "You are easily distracted even when no auditory or visual distractions are present.";
+                            userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.None, recommendationString);
+                            userRecommendation.ExamScores.Add(DistractionTypeForLesson.None, exams[i].Score);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-                if (item.Key == DistractionTypeForLesson.Auditory)
+                else
                 {
-                    recommendationString = "Auditory distractions and stimulations are somewhat bothersome for you. It is recommended that you keep your learning environment " +
-                        "silent. Close all doors and windows, turn off noisy electronic devices and ask people in the room to keep their voices down.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
+                    switch (lessons[i].DistractionType) // Other scenarios
+                    {
+                        case DistractionTypeForLesson.Visual:
+                            boardString[i] = "Visual distractions and stimulations do not appear to bother you.";
+                            recommendationString = "Visual distractions and stimulations do not appear to bother you.";
+                            userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.Visual, recommendationString);
+                            userRecommendation.ExamScores.Add(DistractionTypeForLesson.Visual, exams[i].Score);
+                            break;
+
+                        case DistractionTypeForLesson.Auditory:
+                            boardString[i] = "Auditory distractions and stimulations do not appear to bother you.";
+                            recommendationString = "Auditory distractions and stimulations do not appear to bother you.";
+                            userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.Auditory, recommendationString);
+                            userRecommendation.ExamScores.Add(DistractionTypeForLesson.Auditory, exams[i].Score);
+                            break;
+
+                        case DistractionTypeForLesson.None:
+                            boardString[i] = "Total silence does not appear to bother you.";
+                            recommendationString = "Total silence does not appear to bother you.";
+                            userRecommendation.RecommendationDictionary.Add(DistractionTypeForLesson.None, recommendationString);
+                            userRecommendation.ExamScores.Add(DistractionTypeForLesson.None, exams[i].Score);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-                /*if (item.Key == DistractionTypeForLesson.None)
-                {
-                    recommendationString = "Visual distractions and stimulations are particularly bothersome for you. It is recommended that you keep your learning environment" +
-                        "tidy, clean and remove various objects from the periphery of your vision while studying.";
-                    userRecommendation.RecommendationDictionary.Add(item.Key, recommendationString);
-                }*/
             }
         }
-        //string json = JsonConvert.SerializeObject(userRecommendation);
-        File.WriteAllText(@"e:\report.json", JsonConvert.SerializeObject(userRecommendation));
-        DisplayReportOnBoard(string.Format("Final Recommendations: \n" + userRecommendation.RecommendationDictionary[DistractionTypeForLesson.Visual] + "\n" +
-           userRecommendation.RecommendationDictionary[DistractionTypeForLesson.Auditory]));
-      
+        finalBoardString = string.Join("\n", boardString); // Concat board strings
+        File.WriteAllText(Application.persistentDataPath + "/RecommendationReport.json", JsonConvert.SerializeObject(userRecommendation, Formatting.Indented)); // Note - persistentDataPath is different for each platform. Can't use Windows paths for Android applications.
+        DisplayReportOnBoard(string.Format("Final Recommendations: \n" + finalBoardString));
     }
 
     public void DisplayReportOnBoard(string s)
@@ -596,6 +593,7 @@ public class Board : MonoBehaviour
     }
 }
 
+// Enumerators - add to these if we want to add new types of distractions or lesson sessions
 public enum LessonType
 {
     Visual,
